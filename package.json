@@ -1,0 +1,23 @@
+{
+  "name": "ada_placements",
+  "version": "0.1.0",
+  "description": "Create Internship Placements for Ada Developers Academy",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jandress94/ada_placements.git"
+  },
+  "author": "Jim Andress (jim.andress@gmail.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jandress94/ada_placements/issues"
+  },
+  "homepage": "https://github.com/jandress94/ada_placements#readme",
+  "devDependencies": {
+    "electron": "^7.1.10"
+  }
+}
