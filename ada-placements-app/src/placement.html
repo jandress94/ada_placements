@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Placement!</title>
+  </head>
+  <body>
+    <h1>💖 Placement!</h1>
+    <p id='placements'></p>
+
+    <script type="text/javascript">
+    	const electron = require('electron');
+    	const {ipcRenderer} = electron;
+    	const p = document.querySelector('#placements');
+
+    	ipcRenderer.on('loadScores', function(e, filepath) {
+        console.log(e);
+        console.log(filepath);
+    		p.textContent = filepath;
+    	});
+    </script>
+  </body>
+</html>

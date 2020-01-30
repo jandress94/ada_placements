@@ -8,5 +8,74 @@
   <body>
     <h1>💖 Hello World!</h1>
     <p>Welcome to your Electron application.</p>
+    <p id='placements'></p>
+
+    <script type="text/javascript">
+    	const electron = require('electron');
+    	const {ipcRenderer} = electron;
+			const fs = require("fs");
+			const parse = require('csv-parse/lib/sync');
+			const solver = require("javascript-lp-solver/src/solver");
+    	const p = document.querySelector('#placements');
+
+    	ipcRenderer.on('loadScores', function(e, filepath) {
+				var data = fs.readFileSync(filepath);
+				var records = parse(data.toString(), {
+					cast: true,
+					columns: false,
+					from: 2,
+					skip_empty_lines: true,
+				});
+				console.log(records);
+
+				var intVars = {};
+				var variables = {};
+				var constraints = {};
+
+				for (let index = 0; index < records.length; index++) {
+					let row = records[index];
+					let personCompanyVar = "var_" + row[0] + "_" + row[1];
+					let personConstraint = "person_" + row[0];
+					let companyConstraint = "company_" + row[1];
+					let overwriteConstraint = "overwrite_" + row[0] + "_" + row[1]
+
+					variables[personCompanyVar] = {
+					  [personConstraint]: 1,
+					  [companyConstraint]: 1,
+					  [overwriteConstraint]: 1,
+					  score: row[2]
+					}
+
+					let overwrite = row[3].toLowerCase()
+					if (overwrite === 'true') {
+					  constraints[overwriteConstraint] = { equal: 1 };
+					} else if (overwrite === 'false') {
+					  constraints[overwriteConstraint] = { equal: 0 };
+					}
+
+					intVars[personCompanyVar] = 1
+
+					if (!constraints.hasOwnProperty(personConstraint)) {
+					  constraints[personConstraint] = { equal: 1 };
+					}
+
+					if (!constraints.hasOwnProperty(companyConstraint)) {
+					  constraints[companyConstraint] = { equal: 1 };
+					}
+				}
+
+				model = {
+					optimize: "score",
+					opType: "max",
+					constraints: constraints,
+					variables: variables,
+					ints: intVars
+				}
+
+				console.log(model);
+				console.log(solver.Solve(model));
+    		p.textContent = JSON.stringify(solver.Solve(model));
+    	});
+    </script>
   </body>
 </html>
