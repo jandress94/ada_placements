@@ -77,19 +77,28 @@ function loadScores() {
   });
 };
 
+function isMac() {
+  return process.platform === 'darwin';
+}
+
+function makeShortcut(command) {
+  return (isMac() ? 'Command' : 'Ctrl') + "+" + command;
+};
+
 const mainMenuTemplate = [
   {
     label: 'File',
     submenu: [
       {
         label: 'Load Scores',
+        accelerator: makeShortcut("O"),
         click() {
           loadScores();
         }
       },
       {
         label: 'Quit',
-        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+        accelerator: makeShortcut("Q"),
         click() {
           app.quit();
         }
@@ -99,7 +108,7 @@ const mainMenuTemplate = [
 ]
 
 // If mac, add new first object to menu
-if (process.platform === 'darwin') {
+if (isMac()) {
     mainMenuTemplate.unshift({
       label: app.name,
       submenu: [
