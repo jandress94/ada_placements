@@ -9,14 +9,28 @@
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
     <script src="js/jq/jquery-3.4.1.js"></script>
+
     <script src="js/spa.js"></script>
+    <script src="js/spa.model.js"></script>
+    <script src="js/spa.controller.js"></script>
+    <script src="js/spa.view.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
     <script type="text/javascript">
+      const electron = require('electron');
+      const {ipcRenderer} = electron;
+      // const fs = require("fs");
+      // const parse = require('csv-parse/lib/sync');
+      // const solver = require("javascript-lp-solver/src/solver");
+
       $(document).ready(function(){
-        spa.initModule($('#spa'));
-      })
+        spa.init_module($('#spa'));
+      });
+
+      ipcRenderer.on('loadScores', function(e, filepath) {
+        spa.controller.handle_load_scores(filepath);
+      });
     </script>
   </head>
   <body>

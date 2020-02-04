@@ -1,10 +1,11 @@
-/*global $, spa */
-
 const spa = (function () {
-    var initModule = function ($container) {
-        let text = document.createTextNode("Hello World");
-        $container.append(text);
+
+    const init_module = function ($container) {
+        spa.model.init_module();
+        spa.view.init_module($container);
     };
 
-    return {initModule: initModule};
+    return {
+        init_module: init_module
+    };
 }());
