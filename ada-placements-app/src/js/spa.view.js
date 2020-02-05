@@ -95,9 +95,26 @@ spa.view = (function () {
         });
     };
 
+    const display_placements_page = function(solved_model) {
+        clear_container();
+
+        let placements_div = document.createElement('div');
+        $container.append(placements_div);
+
+        let ul = document.createElement('ul');
+        placements_div.appendChild(ul);
+
+        for (const key in solved_model) {
+            let li = document.createElement('li');
+            li.appendChild(document.createTextNode(key + ": " + solved_model[key]));
+            ul.appendChild(li);
+        }
+    };
+
     return {
         init_module: init_module,
         display_scores_page: display_scores_page,
+        display_placements_page: display_placements_page,
         display_raw: display_raw
     };
 }());

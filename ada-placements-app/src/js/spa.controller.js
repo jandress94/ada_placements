@@ -11,7 +11,7 @@ spa.controller = (function () {
 
     const handle_calculate_button_clicked = function () {
         let solved_model = spa.model.get_solved_model();
-        spa.view.display_raw(solved_model);
+        spa.view.display_placements_page(solved_model);
     };
 
     return {
