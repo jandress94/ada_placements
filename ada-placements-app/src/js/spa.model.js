@@ -56,6 +56,11 @@ spa.model = (function () {
         }
     };
 
+    const update_overwrite = function (score_obj, new_val) {
+        solved_model = null;
+        score_obj.overwrite = new_val;
+    };
+
     const solve_model = function () {
         let intVars = {};
         let variables = {};
@@ -104,6 +109,7 @@ spa.model = (function () {
     return {
         init_module: init_module,
         get_scores: get_scores,
+        update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
         load_scores_from_file: load_scores_from_file
     };
