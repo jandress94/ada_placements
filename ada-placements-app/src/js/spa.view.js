@@ -101,12 +101,44 @@ spa.view = (function () {
         let placements_div = document.createElement('div');
         $container.append(placements_div);
 
+        let recompute_div = document.createElement('div');
+        $container.append(recompute_div);
+
+        let recompute_button = document.createElement('button');
+        recompute_div.appendChild(recompute_button);
+
+        recompute_button.appendChild(document.createTextNode('Recompute Placements'));
+        $(recompute_button).click(function() {
+            spa.controller.handle_calculate_button_clicked();
+        });
+
+        let back_div = document.createElement('div');
+        $container.append(back_div);
+
+        let back_button = document.createElement('button');
+        back_div.appendChild(back_button);
+
+        back_button.appendChild(document.createTextNode('Back to Scores'));
+        $(back_button).click(function() {
+            spa.controller.handle_back_to_scores_button_clicked();
+        });
+
+        let h1 = document.createElement('h1');
+        placements_div.appendChild(h1);
+
+        if (!solved_model.is_feasible) {
+            h1.appendChild(document.createTextNode('No placements possible.'));
+            return;
+        }
+
+        h1.appendChild(document.createTextNode('Created Placements with Score ' + solved_model.score));
+
         let ul = document.createElement('ul');
         placements_div.appendChild(ul);
 
         for (const key in solved_model) {
             let li = document.createElement('li');
-            li.appendChild(document.createTextNode(key + ": " + solved_model[key]));
+            li.appendChild(document.createTextNode(key + ": " + JSON.stringify(solved_model[key])));
             ul.appendChild(li);
         }
     };

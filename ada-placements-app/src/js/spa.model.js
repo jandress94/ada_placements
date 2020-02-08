@@ -82,6 +82,7 @@ spa.model = (function () {
             let overwriteConstraint = "overwrite_" + r.person + "_" + r.company;
 
             variables[personCompanyVar] = {
+                id: r.id,
                 [personConstraint]: 1,
                 [companyConstraint]: 1,
                 [overwriteConstraint]: 1,
@@ -111,7 +112,26 @@ spa.model = (function () {
             ints: intVars
         });
 
-        solved_model = solved_model_raw;
+        console.log(solved_model_raw);
+
+        solved_model = {
+            is_feasible: solved_model_raw.feasible
+        };
+
+        if (solved_model_raw.feasible) {
+            solved_model.score = solved_model_raw.result;
+            solved_model.placements = [];
+
+            for (const key in solved_model_raw) {
+                if (!solved_model_raw.hasOwnProperty(key)) {
+                    continue;
+                }
+
+                if (variables.hasOwnProperty(key)) {
+                    solved_model.placements.push(id_to_score[variables[key].id]);
+                }
+            }
+        }
     };
 
     return {

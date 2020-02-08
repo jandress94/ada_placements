@@ -14,9 +14,14 @@ spa.controller = (function () {
         spa.view.display_placements_page(solved_model);
     };
 
+    const handle_back_to_scores_button_clicked = function () {
+        spa.view.display_scores_page(spa.model.get_scores());
+    };
+
     return {
         handle_load_scores: handle_load_scores,
         handle_overwrite_changed: handle_overwrite_changed,
-        handle_calculate_button_clicked: handle_calculate_button_clicked
+        handle_calculate_button_clicked: handle_calculate_button_clicked,
+        handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked
     };
 }());
