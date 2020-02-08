@@ -19,11 +19,11 @@ spa.view = (function () {
             table_entry.appendChild(content);
             return table_entry;
         };
-        const _create_overwrite = function(score_obj) {
+        const _create_overwrite_select = function(score_obj) {
             let overwrite_select = document.createElement('select');
             $(overwrite_select).change(function() {
                 let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
-                spa.controller.handle_overwrite_changed(score_obj, new_val);
+                spa.controller.handle_overwrite_changed(score_obj.id, new_val);
             });
 
             let blank_option = document.createElement('option');
@@ -78,7 +78,7 @@ spa.view = (function () {
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].company)));
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].score)));
 
-            row.appendChild(_create_table_entry(_create_overwrite(scores[i])));
+            row.appendChild(_create_table_entry(_create_overwrite_select(scores[i])));
 
             scores_table.appendChild(row);
         }

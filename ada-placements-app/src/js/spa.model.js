@@ -4,10 +4,12 @@ const solver = require("javascript-lp-solver/src/solver");
 
 spa.model = (function () {
     let scores;
+    let id_to_score;
     let solved_model;
 
     const init_module = function () {
         scores = null;
+        id_to_score = null;
         solved_model = null;
     };
 
@@ -33,6 +35,7 @@ spa.model = (function () {
         });
 
         scores = [];
+        id_to_score = {};
         for (let i = 1; i < data_csv_parsed.length; i++) {
             let row = data_csv_parsed[i];
 
@@ -47,18 +50,23 @@ spa.model = (function () {
                 throw '"' + overwrite + '" is not a valid value for the overwrite column';
             }
 
-            scores.push({
+            let score_entry = {
+                id: i - 1,
                 person: row[0],
                 company: row[1],
                 score: row[2],
                 overwrite: overwrite
-            });
+            };
+
+            id_to_score[score_entry.id] = score_entry;
+
+            scores.push(score_entry);
         }
     };
 
-    const update_overwrite = function (score_obj, new_val) {
+    const update_overwrite = function (score_id, new_val) {
         solved_model = null;
-        score_obj.overwrite = new_val;
+        id_to_score[score_id].overwrite = new_val;
     };
 
     const solve_model = function () {
