@@ -13,53 +13,48 @@ spa.view = (function () {
         $container.append(document.createTextNode(JSON.stringify(x)));
     };
 
-    const display_scores_page = function (scores) {
-        const _create_table_entry = function(content) {
-            let table_entry = document.createElement('td');
-            table_entry.appendChild(content);
-            return table_entry;
-        };
-        const _create_overwrite_select = function(score_obj) {
-            let overwrite_select = document.createElement('select');
-            $(overwrite_select).change(function() {
-                let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
-                spa.controller.handle_overwrite_changed(score_obj.id, new_val);
-            });
+    const _create_table_entry = function(content) {
+        let table_entry = document.createElement('td');
+        table_entry.appendChild(content);
+        return table_entry;
+    };
 
-            let blank_option = document.createElement('option');
-            blank_option.setAttribute('value', null);
-            overwrite_select.appendChild(blank_option);
+    const _create_overwrite_select = function(score_obj) {
+        let overwrite_select = document.createElement('select');
+        $(overwrite_select).change(function() {
+            let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
+            spa.controller.handle_overwrite_changed(score_obj.id, new_val);
+        });
 
-            let yes_option = document.createElement('option');
-            yes_option.setAttribute('value', true);
-            yes_option.appendChild(document.createTextNode('Yes'));
-            overwrite_select.appendChild(yes_option);
+        let blank_option = document.createElement('option');
+        blank_option.setAttribute('value', null);
+        overwrite_select.appendChild(blank_option);
 
-            let no_option = document.createElement('option');
-            no_option.setAttribute('value', false);
-            no_option.appendChild(document.createTextNode('No'));
-            overwrite_select.appendChild(no_option);
+        let yes_option = document.createElement('option');
+        yes_option.setAttribute('value', true);
+        yes_option.appendChild(document.createTextNode('Yes'));
+        overwrite_select.appendChild(yes_option);
 
-            if (score_obj.overwrite == null) {
-                blank_option.setAttribute('selected', 'selected');
-            } else if (score_obj.overwrite) {
-                yes_option.setAttribute('selected', 'selected');
-            } else if (!score_obj.overwrite) {
-                no_option.setAttribute('selected', 'selected');
-            } else {
-                throw "Unknown overwrite value: " + score_obj.overwrite;
-            }
+        let no_option = document.createElement('option');
+        no_option.setAttribute('value', false);
+        no_option.appendChild(document.createTextNode('No'));
+        overwrite_select.appendChild(no_option);
 
-            return overwrite_select;
-        };
+        if (score_obj.overwrite == null) {
+            blank_option.setAttribute('selected', 'selected');
+        } else if (score_obj.overwrite) {
+            yes_option.setAttribute('selected', 'selected');
+        } else if (!score_obj.overwrite) {
+            no_option.setAttribute('selected', 'selected');
+        } else {
+            throw "Unknown overwrite value: " + score_obj.overwrite;
+        }
 
-        clear_container();
+        return overwrite_select;
+    };
 
-        let scores_div = document.createElement('div');
-        $container.append(scores_div);
-
+    const _create_table_for_scores = function (scores) {
         let scores_table = document.createElement('table');
-        scores_div.appendChild(scores_table);
 
         let header_row = document.createElement('tr');
 
@@ -82,6 +77,16 @@ spa.view = (function () {
 
             scores_table.appendChild(row);
         }
+        return scores_table;
+    };
+
+    const display_scores_page = function (scores) {
+        clear_container();
+
+        let scores_div = document.createElement('div');
+        $container.append(scores_div);
+
+        scores_div.appendChild(_create_table_for_scores(scores));
 
         let calculate_div = document.createElement('div');
         $container.append(calculate_div);
@@ -133,14 +138,7 @@ spa.view = (function () {
 
         h1.appendChild(document.createTextNode('Created Placements with Score ' + solved_model.score));
 
-        let ul = document.createElement('ul');
-        placements_div.appendChild(ul);
-
-        for (const key in solved_model) {
-            let li = document.createElement('li');
-            li.appendChild(document.createTextNode(key + ": " + JSON.stringify(solved_model[key])));
-            ul.appendChild(li);
-        }
+        placements_div.appendChild(_create_table_for_scores(solved_model.placements));
     };
 
     return {

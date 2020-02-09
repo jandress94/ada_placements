@@ -6,7 +6,6 @@ spa.controller = (function () {
 
     const handle_overwrite_changed = function (score_id, new_val) {
         spa.model.update_overwrite(score_id, new_val);
-        spa.view.display_scores_page(spa.model.get_scores());
     };
 
     const handle_calculate_button_clicked = function () {
