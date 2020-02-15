@@ -25,8 +25,13 @@
         spa.init_module($('#spa'));
       });
 
-      ipcRenderer.on('loadScores', function(e, filepath) {
-        spa.controller.handle_load_scores(filepath);
+      ipcRenderer.on('loadScoresFromFile', function(e, filepath) {
+        spa.controller.handle_load_scores_from_file(filepath);
+      });
+
+      ipcRenderer.on('loadScoresFromSheets', function(e, sheetUrl) {
+        alert(sheetUrl);
+        // spa.controller.handle_load_scores_from_sheets(sheetUrl);
       });
     </script>
   </head>

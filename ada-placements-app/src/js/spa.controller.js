@@ -1,6 +1,11 @@
 spa.controller = (function () {
-    const handle_load_scores = function (filepath) {
+    const handle_load_scores_from_file = function (filepath) {
         spa.model.load_scores_from_file(filepath);
+        spa.view.display_scores_page(spa.model.get_scores());
+    };
+
+    const handle_load_scores_from_sheets = function (sheetUrl) {
+        spa.model.load_scores_from_sheets(sheetUrl);
         spa.view.display_scores_page(spa.model.get_scores());
     };
 
@@ -18,7 +23,8 @@ spa.controller = (function () {
     };
 
     return {
-        handle_load_scores: handle_load_scores,
+        handle_load_scores_from_file: handle_load_scores_from_file,
+        handle_load_scores_from_sheets: handle_load_scores_from_sheets,
         handle_overwrite_changed: handle_overwrite_changed,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked

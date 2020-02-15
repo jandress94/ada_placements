@@ -26,6 +26,8 @@ spa.model = (function () {
     
     const load_scores_from_file = function (filepath) {
         solved_model = null;
+        scores = [];
+        id_to_score = {};
 
         let data_csv_raw = fs.readFileSync(filepath);
         let data_csv_parsed = parse(data_csv_raw.toString(), {
@@ -34,8 +36,6 @@ spa.model = (function () {
            skip_empty_lines: true
         });
 
-        scores = [];
-        id_to_score = {};
         for (let i = 1; i < data_csv_parsed.length; i++) {
             let row = data_csv_parsed[i];
 
@@ -62,6 +62,12 @@ spa.model = (function () {
 
             scores.push(score_entry);
         }
+    };
+
+    const load_scores_from_sheets = function (sheetUrl) {
+        solved_model = null;
+        scores = [];
+        id_to_score = {};
     };
 
     const update_overwrite = function (score_id, new_val) {
@@ -139,6 +145,7 @@ spa.model = (function () {
         get_scores: get_scores,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
-        load_scores_from_file: load_scores_from_file
+        load_scores_from_file: load_scores_from_file,
+        load_scores_from_sheets: load_scores_from_sheets
     };
 }());
