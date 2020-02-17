@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Authentication</title>
+
+    <link rel="stylesheet" href="index.css">
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <script src="js/jq/jquery-3.4.1.js"></script>
+
+    <script>if (window.module) module = window.module;</script>
+
+    <script type="text/javascript">
+      const electron = require('electron');
+      const {ipcRenderer} = electron;
+
+      $(document).ready(function(){
+        const form = document.querySelector('form');
+        form.addEventListener('submit', sendSheetURL);
+      });
+
+      function sendSheetURL(e) {
+        e.preventDefault();
+        const sheetURL = document.querySelector('#sheetURLInput').value;
+        ipcRenderer.send('sheetURL', sheetURL);
+      }
+    </script>
+  </head>
+  <body>
+    <form>
+      <div>
+        <label>Paste the URL of a Google Sheet containing the scores:</label>
+        <input type="text" id="sheetURLInput">
+      </div>
+      <br />
+      <button type="submit">Load Sheet</button>
+    </form>
+  </body>
+</html>

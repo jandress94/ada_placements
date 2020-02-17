@@ -1,16 +1,25 @@
 const fs = require("fs");
 const parse = require('csv-parse/lib/sync');
 const solver = require("javascript-lp-solver/src/solver");
+const {google} = require('googleapis');
 
 spa.model = (function () {
     let scores;
     let id_to_score;
     let solved_model;
+    let oAuth2Client;
 
     const init_module = function () {
         scores = null;
         id_to_score = null;
         solved_model = null;
+
+        fs.readFile('credentials.json', (err, credentials) => {
+            if (err) return console.log('Error loading client secret file:', err);
+
+            const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
+            oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+        });
     };
 
     const get_scores = function () {
@@ -23,23 +32,16 @@ spa.model = (function () {
         }
         return solved_model;
     };
-    
-    const load_scores_from_file = function (filepath) {
+
+    const _load_scores_from_array = function(data_array) {
         solved_model = null;
         scores = [];
         id_to_score = {};
 
-        let data_csv_raw = fs.readFileSync(filepath);
-        let data_csv_parsed = parse(data_csv_raw.toString(), {
-           cast: true,
-           columns: false,
-           skip_empty_lines: true
-        });
+        for (let i = 1; i < data_array.length; i++) {
+            let row = data_array[i];
 
-        for (let i = 1; i < data_csv_parsed.length; i++) {
-            let row = data_csv_parsed[i];
-
-            let overwrite = row[3].toLowerCase();
+            let overwrite = row.length >= 4 ? row[3].toLowerCase() : '';
             if (overwrite === '') {
                 overwrite = null;
             } else if (overwrite === 'true') {
@@ -63,11 +65,34 @@ spa.model = (function () {
             scores.push(score_entry);
         }
     };
+    
+    const load_scores_from_file = function (filepath) {
+        let data_csv_raw = fs.readFileSync(filepath);
+        let data_csv_parsed = parse(data_csv_raw.toString(), {
+           cast: true,
+           columns: false,
+           skip_empty_lines: true
+        });
+
+        _load_scores_from_array(data_csv_parsed);
+    };
 
     const load_scores_from_sheets = function (sheetUrl) {
-        solved_model = null;
-        scores = [];
-        id_to_score = {};
+        let TOKEN_PATH = './token.json';
+
+        let token = fs.readFileSync(TOKEN_PATH);
+
+        oAuth2Client.setCredentials(JSON.parse(token));
+
+        const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
+        return sheets.spreadsheets.values.get({
+            spreadsheetId: sheetUrl,
+            range: 'A:D',
+        }).then(res => {
+            _load_scores_from_array(res.data.values);
+        }).catch(err => {
+            console.error('The API returned an error: ' + err)
+        });
     };
 
     const update_overwrite = function (score_id, new_val) {

@@ -1,3 +1,7 @@
+const electron_view = require('electron');
+const {clipboard} = electron_view;
+
+
 spa.view = (function () {
     let $container;
 
@@ -141,10 +145,51 @@ spa.view = (function () {
         placements_div.appendChild(_create_table_for_scores(solved_model.placements));
     };
 
+    const display_auth_page = function (auth_url, load_and_display_sheet_fn) {
+        clear_container();
+
+        let auth_url_div = document.createElement('div');
+        $container.append(auth_url_div);
+
+        auth_url_div.appendChild(document.createTextNode('Click button to copy authentication URL: '));
+
+        let button_copy = document.createElement('button');
+        button_copy.appendChild(document.createTextNode('Copy URL'));
+        auth_url_div.appendChild((button_copy));
+        $(button_copy).click(function () {
+            clipboard.writeText(auth_url);
+            alert('URL copied to clipboard!');
+        });
+
+        let auth_code_div = document.createElement('div');
+        $container.append(auth_code_div);
+
+        let form = document.createElement('form');
+        auth_code_div.appendChild(form);
+
+        form.appendChild(document.createTextNode('Paste the URL into a web browser, and enter the code from that page here: '));
+
+        let input_code = document.createElement('input');
+        $(input_code).attr('type', 'text');
+        form.appendChild(input_code);
+
+        form.appendChild(document.createElement('br'))
+
+        let button_submit = document.createElement('button');
+        button_submit.appendChild(document.createTextNode('Authenticate'));
+        form.appendChild(button_submit);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            load_and_display_sheet_fn(false, input_code.value);
+        });
+    };
+
     return {
         init_module: init_module,
         display_scores_page: display_scores_page,
         display_placements_page: display_placements_page,
-        display_raw: display_raw
+        display_raw: display_raw,
+        display_auth_page: display_auth_page
     };
 }());

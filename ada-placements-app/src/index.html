@@ -30,8 +30,7 @@
       });
 
       ipcRenderer.on('loadScoresFromSheets', function(e, sheetUrl) {
-        alert(sheetUrl);
-        // spa.controller.handle_load_scores_from_sheets(sheetUrl);
+        spa.controller.handle_load_scores_from_sheets(sheetUrl);
       });
     </script>
   </head>

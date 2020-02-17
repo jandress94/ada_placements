@@ -2,7 +2,6 @@ const { app, BrowserWindow, Menu, dialog, ipcMain } = require('electron');
 const contextMenu = require('electron-context-menu');
 const path = require('path');
 const fs = require('fs');
-const readline = require('readline');
 const {google} = require('googleapis');
 
 
@@ -21,6 +20,7 @@ contextMenu({
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let googleAuthWindow;
+let googleSheetsURLWindow;
 let oAuth2Client;
 
 const createWindow = () => {
@@ -109,8 +109,8 @@ function createAuthWindow(authUrl) {
   // garbage collection
   googleAuthWindow.on('close', function() {
     googleAuthWindow = null;
-  })
-};
+  });
+}
 
 ipcMain.on('authCode', (event, authCode) => {
   googleAuthWindow.close();
@@ -120,13 +120,12 @@ ipcMain.on('authCode', (event, authCode) => {
       dialog.showErrorBox('Error Authenticating', "The provided authentication code was incorrect.");
       return
     }
-    oAuth2Client.setCredentials(token);
     // Store the token to disk for later program executions
     fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
       if (err) return console.error(err);
       console.log('Token stored to', TOKEN_PATH);
     });
-    getAndSendSheetsURL();
+    createGoogleSheetsURLWindow();
   });
 });
 
@@ -139,9 +138,29 @@ function getNewToken(oAuth2Client) {
   createAuthWindow(authUrl);
 }
 
-function getAndSendSheetsURL() {
-  mainWindow.webContents.send('loadScoresFromSheets', 'https://docs.google.com/spreadsheets/d/1ZasXRqaQEE4y5ATvELnwKwmUvP5aN5w5YDme4-2ufns/edit#gid=0');
+function createGoogleSheetsURLWindow() {
+  // Create the browser window.
+  googleSheetsURLWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    title: 'Google Sheet URL',
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  googleSheetsURLWindow.loadFile(path.join(__dirname, 'googleSheetURL.html'));
+
+  // garbage collection
+  googleSheetsURLWindow.on('close', function() {
+    googleSheetsURLWindow = null;
+  });
 }
+
+ipcMain.on('sheetURL', (event, sheetURL) => {
+  googleSheetsURLWindow.close();
+  mainWindow.webContents.send('loadScoresFromSheets', sheetURL);
+});
 
 function loadScoresFromSheets() {
   fs.readFile('credentials.json', (err, content) => {
@@ -159,8 +178,7 @@ function loadScoresFromSheets() {
       if (err) {
         getNewToken(oAuth2Client);
       } else {
-        oAuth2Client.setCredentials(JSON.parse(token));
-        getAndSendSheetsURL();
+        createGoogleSheetsURLWindow();
       }
     });
   });

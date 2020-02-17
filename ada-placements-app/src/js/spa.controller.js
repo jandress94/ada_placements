@@ -5,8 +5,9 @@ spa.controller = (function () {
     };
 
     const handle_load_scores_from_sheets = function (sheetUrl) {
-        spa.model.load_scores_from_sheets(sheetUrl);
-        spa.view.display_scores_page(spa.model.get_scores());
+        spa.model.load_scores_from_sheets(sheetUrl).then(function(){
+            spa.view.display_scores_page(spa.model.get_scores());
+        });
     };
 
     const handle_overwrite_changed = function (score_id, new_val) {
