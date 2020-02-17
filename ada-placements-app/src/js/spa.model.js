@@ -43,7 +43,7 @@ spa.model = (function () {
         for (let i = 1; i < data_array.length; i++) {
             let row = data_array[i];
 
-            let overwrite = row.length >= 4 ? row[3].toLowerCase() : '';
+            let overwrite = row.length >= 5 ? row[4].toLowerCase() : '';
             if (overwrite === '') {
                 overwrite = null;
             } else if (overwrite === 'true') {
@@ -58,7 +58,9 @@ spa.model = (function () {
                 id: i - 1,
                 person: row[0],
                 company: row[1],
-                score: row[2],
+                person_score: row[2],
+                company_score: row[3],
+                score: row[2] * row[3],
                 overwrite: overwrite
             };
 
@@ -87,7 +89,7 @@ spa.model = (function () {
         const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
         return sheets.spreadsheets.values.get({
             spreadsheetId: sheetUrl,
-            range: 'A:D',
+            range: 'A:E',
         }).then(res => {
             _load_scores_from_array(res.data.values);
         }).catch(err => {
