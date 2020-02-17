@@ -131,7 +131,7 @@ ipcMain.on('authCode', (event, authCode) => {
 function getNewToken(oAuth2Client) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    scope: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
   createAuthWindow(authUrl);

@@ -180,12 +180,60 @@ spa.model = (function () {
         }
     };
 
+    const _save_placements_to_array = function(scores_array) {
+        let values = [['Person', 'Company', 'Person Score', 'Company Score', 'Overwrite']];
+        for (let i = 0; i < scores_array.length; i++) {
+            let s = scores_array[i];
+            values.push([
+                s.person,
+                s.company,
+                s.person_score,
+                s.company_score,
+                s.overwrite
+            ]);
+        }
+        return values;
+    };
+
+    const save_placements_to_sheets = function() {
+        const resource_create = {
+            properties: {
+                title: 'Placements'
+            }
+        };
+        const resource_update = {
+            values: _save_placements_to_array(solved_model.placements)
+        };
+
+        const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
+        return new Promise((resolve, reject) => {
+            sheets.spreadsheets.create({
+                resource: resource_create,
+                fields: 'spreadsheetId'
+            }).then(function(spreadsheet) {
+                sheets.spreadsheets.values.update({
+                    spreadsheetId: spreadsheet.data.spreadsheetId,
+                    range: 'A:E',
+                    valueInputOption: 'RAW',
+                    resource: resource_update
+                }).then(function (result) {
+                    return resolve('Placements saved with spreadsheetId ' + spreadsheet.data.spreadsheetId);
+                }).catch(function (err) {
+                    return reject("Error saving placements to new spreadsheet: " + err);
+                })
+            }).catch(function(err) {
+                return reject("Error creating new spreadsheet for placements: " + err);
+            })
+        });
+    };
+
     return {
         init_module: init_module,
         get_scores: get_scores,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
         load_scores_from_file: load_scores_from_file,
-        load_scores_from_sheets: load_scores_from_sheets
+        load_scores_from_sheets: load_scores_from_sheets,
+        save_placements_to_sheets: save_placements_to_sheets
     };
 }());

@@ -23,11 +23,21 @@ spa.controller = (function () {
         spa.view.display_scores_page(spa.model.get_scores());
     };
 
+    const handle_save_placements_button_clicked = function () {
+        spa.model.save_placements_to_sheets()
+            .then(function(successMsg) {
+                alert(successMsg);
+            }).catch(function(err) {
+                alert(err);
+            });
+    };
+
     return {
         handle_load_scores_from_file: handle_load_scores_from_file,
         handle_load_scores_from_sheets: handle_load_scores_from_sheets,
         handle_overwrite_changed: handle_overwrite_changed,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
-        handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked
+        handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,
+        handle_save_placements_button_clicked: handle_save_placements_button_clicked
     };
 }());
