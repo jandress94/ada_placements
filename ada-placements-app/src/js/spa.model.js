@@ -1,5 +1,7 @@
 const fs = require("fs");
+const { dialog } = require('electron').remote
 const parse = require('csv-parse/lib/sync');
+const { convertArrayToCSV } = require('convert-array-to-csv');
 const solver = require("javascript-lp-solver/src/solver");
 const {google} = require('googleapis');
 const constants = require('./js/constants');
@@ -227,6 +229,26 @@ spa.model = (function () {
         });
     };
 
+    const save_placements_to_csv = function() {
+        return new Promise((resolve, reject) => {
+            dialog.showSaveDialog({
+                filters: [
+                    { name: 'CSV', extensions: ['csv'] }
+                ]
+            }).then(result => {
+                if (!result.canceled) {
+                    fs.writeFile(result.filePath, convertArrayToCSV(_save_placements_to_array(solved_model.placements)), function(err) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve("File Saved");
+                        }
+                    });
+                }
+            });
+        });
+    };
+
     return {
         init_module: init_module,
         get_scores: get_scores,
@@ -234,6 +256,7 @@ spa.model = (function () {
         get_solved_model: get_solved_model,
         load_scores_from_file: load_scores_from_file,
         load_scores_from_sheets: load_scores_from_sheets,
-        save_placements_to_sheets: save_placements_to_sheets
+        save_placements_to_sheets: save_placements_to_sheets,
+        save_placements_to_csv: save_placements_to_csv
     };
 }());

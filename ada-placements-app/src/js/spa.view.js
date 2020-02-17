@@ -123,12 +123,20 @@ spa.view = (function () {
         let save_div = document.createElement('div');
         $container.append(save_div);
 
-        let save_button = document.createElement('button');
-        save_div.appendChild(save_button);
+        let save_sheets_button = document.createElement('button');
+        save_div.appendChild(save_sheets_button);
 
-        save_button.appendChild(document.createTextNode('Save to Google Sheets'));
-        $(save_button).click(function() {
-            spa.controller.handle_save_placements_button_clicked();
+        save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
+        $(save_sheets_button).click(function() {
+            spa.controller.handle_save_sheets_button_clicked();
+        });
+
+        let save_csv_button = document.createElement('button');
+        save_div.appendChild(save_csv_button);
+
+        save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
+        $(save_csv_button).click(function() {
+            spa.controller.handle_save_csv_button_clicked();
         });
 
         let back_div = document.createElement('div');

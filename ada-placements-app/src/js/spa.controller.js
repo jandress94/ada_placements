@@ -24,12 +24,19 @@ spa.controller = (function () {
     };
 
     const handle_save_placements_button_clicked = function () {
-        spa.model.save_placements_to_sheets()
-            .then(function(successMsg) {
-                alert(successMsg);
-            }).catch(function(err) {
-                alert(err);
-            });
+        spa.model.save_placements_to_sheets().then(function(successMsg) {
+            alert(successMsg);
+        }).catch(function(err) {
+            alert(err);
+        });
+    };
+
+    const handle_save_csv_button_clicked = function () {
+        spa.model.save_placements_to_csv().then(function(successMsg) {
+            alert(successMsg);
+        }).catch(function(err) {
+            alert(err);
+        });
     };
 
     return {
@@ -38,6 +45,7 @@ spa.controller = (function () {
         handle_overwrite_changed: handle_overwrite_changed,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,
-        handle_save_placements_button_clicked: handle_save_placements_button_clicked
+        handle_save_sheets_button_clicked: handle_save_placements_button_clicked,
+        handle_save_csv_button_clicked: handle_save_csv_button_clicked
     };
 }());
