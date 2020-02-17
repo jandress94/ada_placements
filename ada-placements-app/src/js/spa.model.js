@@ -81,6 +81,19 @@ spa.model = (function () {
         _load_scores_from_array(data_csv_parsed);
     };
 
+    const _sheet_url_to_sheet_id = function (sheetUrl) {
+        if (sheetUrl.match(/^[a-zA-Z0-9-_]+$/g) != null) {
+            return sheetUrl;
+        } else {
+            let matches = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            if (matches.length > 0) {
+                return matches[1];
+            } else {
+                return null;
+            }
+        }
+    };
+
     const load_scores_from_sheets = function (sheetUrl) {
         let token = fs.readFileSync(constants.TOKEN_PATH);
 
@@ -88,7 +101,7 @@ spa.model = (function () {
 
         const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
         return sheets.spreadsheets.values.get({
-            spreadsheetId: sheetUrl,
+            spreadsheetId: _sheet_url_to_sheet_id(sheetUrl),
             range: 'A:E',
         }).then(res => {
             _load_scores_from_array(res.data.values);
