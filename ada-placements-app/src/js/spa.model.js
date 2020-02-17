@@ -2,6 +2,8 @@ const fs = require("fs");
 const parse = require('csv-parse/lib/sync');
 const solver = require("javascript-lp-solver/src/solver");
 const {google} = require('googleapis');
+const constants = require('./js/constants');
+
 
 spa.model = (function () {
     let scores;
@@ -14,7 +16,7 @@ spa.model = (function () {
         id_to_score = null;
         solved_model = null;
 
-        fs.readFile('credentials.json', (err, credentials) => {
+        fs.readFile(constants.GOOGLE_CREDENTIALS_PATH, (err, credentials) => {
             if (err) return console.log('Error loading client secret file:', err);
 
             const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
@@ -78,9 +80,7 @@ spa.model = (function () {
     };
 
     const load_scores_from_sheets = function (sheetUrl) {
-        let TOKEN_PATH = './token.json';
-
-        let token = fs.readFileSync(TOKEN_PATH);
+        let token = fs.readFileSync(constants.TOKEN_PATH);
 
         oAuth2Client.setCredentials(JSON.parse(token));
 

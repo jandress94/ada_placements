@@ -3,9 +3,8 @@ const contextMenu = require('electron-context-menu');
 const path = require('path');
 const fs = require('fs');
 const {google} = require('googleapis');
+const constants = require('./constants');
 
-
-const TOKEN_PATH = 'token.json';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -35,7 +34,7 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(true);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(path.dirname(__dirname), 'index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
@@ -102,7 +101,7 @@ function createAuthWindow(authUrl) {
     }
   });
 
-  googleAuthWindow.loadFile(path.join(__dirname, 'googleAuth.html')).then(value => {
+  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'googleAuth.html')).then(value => {
     googleAuthWindow.webContents.send('authUrl', authUrl);
   });
 
@@ -121,9 +120,9 @@ ipcMain.on('authCode', (event, authCode) => {
       return
     }
     // Store the token to disk for later program executions
-    fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+    fs.writeFile(constants.TOKEN_PATH, JSON.stringify(token), (err) => {
       if (err) return console.error(err);
-      console.log('Token stored to', TOKEN_PATH);
+      console.log('Token stored to', constants.TOKEN_PATH);
     });
     createGoogleSheetsURLWindow();
   });
@@ -149,7 +148,7 @@ function createGoogleSheetsURLWindow() {
     }
   });
 
-  googleSheetsURLWindow.loadFile(path.join(__dirname, 'googleSheetURL.html'));
+  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'googleSheetURL.html'));
 
   // garbage collection
   googleSheetsURLWindow.on('close', function() {
@@ -163,7 +162,7 @@ ipcMain.on('sheetURL', (event, sheetURL) => {
 });
 
 function loadScoresFromSheets() {
-  fs.readFile('credentials.json', (err, content) => {
+  fs.readFile(constants.GOOGLE_CREDENTIALS_PATH, (err, content) => {
     if (err) {
       dialog.showErrorBox('Error Reading Credentials', "Unable to read credentials file: " + err);
       return;
@@ -174,13 +173,18 @@ function loadScoresFromSheets() {
     oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) {
-        getNewToken(oAuth2Client);
-      } else {
-        createGoogleSheetsURLWindow();
-      }
-    });
+    if (fs.existsSync(constants.TOKEN_PATH)) {
+      createGoogleSheetsURLWindow();
+    } else {
+      getNewToken(oAuth2Client);
+    }
+    // fs.readFile(TOKEN_PATH, (err, token) => {
+    //   if (err) {
+    //     getNewToken(oAuth2Client);
+    //   } else {
+    //     createGoogleSheetsURLWindow();
+    //   }
+    // });
   });
 }
 
