@@ -3,6 +3,7 @@ const contextMenu = require('electron-context-menu');
 const path = require('path');
 
 const placement_index = require('./placement/index');
+const scheduler_index = require('./scheduler/index');
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -17,9 +18,8 @@ contextMenu({
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-// let googleAuthWindow;
 
-ada_modules = [placement_index];
+ada_modules = [placement_index, scheduler_index];
 
 const createWindow = () => {
   // Create the browser window.

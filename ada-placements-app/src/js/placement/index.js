@@ -3,9 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const {google} = require('googleapis');
 const constants = require('./constants');
-//
-// // Keep a global reference of the window objects, if you don't, the window will
-// // be closed automatically when the JavaScript object is garbage collected.
+
+// Keep a global reference of the window objects, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let oAuth2Client;
 let googleAuthWindow;
