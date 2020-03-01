@@ -1,9 +1,8 @@
-const { app, BrowserWindow, Menu, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const contextMenu = require('electron-context-menu');
 const path = require('path');
-const fs = require('fs');
-const {google} = require('googleapis');
-const constants = require('./placement/constants');
+
+const placement_index = require('./placement/index');
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -18,9 +17,9 @@ contextMenu({
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let googleAuthWindow;
-let googleSheetsURLWindow;
-let oAuth2Client;
+// let googleAuthWindow;
+
+ada_modules = [placement_index];
 
 const createWindow = () => {
   // Create the browser window.
@@ -31,13 +30,15 @@ const createWindow = () => {
       nodeIntegration: true
     }
   });
+
+  for (let i = 0; i < ada_modules.length; i++) {
+    ada_modules[i].init(mainWindow);
+  }
+
   mainWindow.setMenuBarVisibility(true);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'index.html'));
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'index.html'));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -45,7 +46,10 @@ const createWindow = () => {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
-    googleAuthWindow = null;
+
+    for (let i = 0; i < ada_modules.length; i++) {
+      ada_modules[i].close();
+    }
   });
 
   // Build menu from template
@@ -76,160 +80,17 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-function loadScoresFromFile() {
-  dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{ name: 'CSV', extensions: ['csv'] }]
-  }).then(result => {
-    if (!result.canceled) {
-      // send the filepath to the placements page
-      mainWindow.webContents.send('loadScoresFromFile', result.filePaths[0]);
-    }
-  });
-};
-
-function createAuthWindow(authUrl) {
-  // Create the browser window.
-  googleAuthWindow = new BrowserWindow({
-    width: 400,
-    height: 200,
-    title: 'Google Authentication',
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-
-  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'googleAuth.html')).then(value => {
-    googleAuthWindow.webContents.send('authUrl', authUrl);
-  });
-
-  // garbage collection
-  googleAuthWindow.on('close', function() {
-    googleAuthWindow = null;
-  });
-}
-
-ipcMain.on('authCode', (event, authCode) => {
-  googleAuthWindow.close();
-
-  oAuth2Client.getToken(authCode, (err, token) => {
-    if (err) {
-      dialog.showErrorBox('Error Authenticating', "The provided authentication code was incorrect.");
-      return
-    }
-    // Store the token to disk for later program executions
-    fs.writeFile(constants.TOKEN_PATH, JSON.stringify(token), (err) => {
-      if (err) return console.error(err);
-      console.log('Token stored to', constants.TOKEN_PATH);
-    });
-    createGoogleSheetsURLWindow();
-  });
-});
-
-function getNewToken(oAuth2Client) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-
-  createAuthWindow(authUrl);
-}
-
-function createGoogleSheetsURLWindow() {
-  // Create the browser window.
-  googleSheetsURLWindow = new BrowserWindow({
-    width: 400,
-    height: 200,
-    title: 'Google Sheet URL',
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-
-  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'googleSheetURL.html'));
-
-  // garbage collection
-  googleSheetsURLWindow.on('close', function() {
-    googleSheetsURLWindow = null;
-  });
-}
-
-ipcMain.on('sheetURL', (event, sheetURL) => {
-  googleSheetsURLWindow.close();
-  mainWindow.webContents.send('loadScoresFromSheets', sheetURL);
-});
-
-function loadScoresFromSheets() {
-  fs.readFile(constants.GOOGLE_CREDENTIALS_PATH, (err, content) => {
-    if (err) {
-      dialog.showErrorBox('Error Reading Credentials', "Unable to read credentials file: " + err);
-      return;
-    }
-
-    // Authorize a client with credentials, then call the Google Sheets API.
-    const {client_secret, client_id, redirect_uris} = JSON.parse(content).installed;
-    oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-    // Check if we have previously stored a token.
-    if (fs.existsSync(constants.TOKEN_PATH)) {
-      createGoogleSheetsURLWindow();
-    } else {
-      getNewToken(oAuth2Client);
-    }
-  });
-}
-
-function isMac() {
-  return process.platform === 'darwin';
-}
-
-function makeShortcut(command) {
-  return (isMac() ? 'Command' : 'Ctrl') + "+" + command;
-}
-
 const mainMenuTemplate = [
   {
-    label: 'File',
-    submenu: [
-      {
-        label: 'Load Scores from File',
-        // accelerator: makeShortcut("O"),
-        click() {
-          loadScoresFromFile();
-        }
-      },
-      {
-        label: 'Load Scores from Google Sheets',
-        accelerator: makeShortcut("O"),
-        click() {
-          loadScoresFromSheets();
-        }
-      },
-      {
-        label: 'Quit',
-        accelerator: makeShortcut("Q"),
-        click() {
-          app.quit();
-        }
-      }
-    ]
-  }
-];
-
-// If mac, add new first object to menu
-if (isMac()) {
-  mainMenuTemplate.unshift({
     label: app.name,
     submenu: [
       {role: 'about'},
       {role: 'quit'}
     ]
-  });
-
-  // Edit menu
-  mainMenuTemplate[1].submenu.pop(1);
+  }
+];
+for (let i = 0; i < ada_modules.length; i++) {
+  mainMenuTemplate.push(...ada_modules[i].get_menu_items());
 }
 
 // Add developers tools item if not in prod
@@ -244,5 +105,5 @@ if (process.env.NODE_ENV !== 'production') {
         role: 'reload'
       }
     ]
-  })
+  });
 }
