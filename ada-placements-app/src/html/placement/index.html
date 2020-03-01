@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
 
-    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../../css/index.css">
 
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-    <script src="../js/jq/jquery-3.4.1.js"></script>
+    <script src="../../js/jq/jquery-3.4.1.js"></script>
 
-    <script src="../js/spa.js"></script>
-    <script src="../js/spa.model.js"></script>
-    <script src="../js/spa.controller.js"></script>
-    <script src="../js/spa.view.js"></script>
+    <script src="../../js/placement/placement.js"></script>
+    <script src="../../js/placement/placement.model.js"></script>
+    <script src="../../js/placement/placement.controller.js"></script>
+    <script src="../../js/placement/placement.view.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
@@ -22,19 +22,19 @@
       const {ipcRenderer} = electron;
 
       $(document).ready(function(){
-        spa.init_module($('#spa'));
+        placement.init_module($('#placement_content_div'));
       });
 
       ipcRenderer.on('loadScoresFromFile', function(e, filepath) {
-        spa.controller.handle_load_scores_from_file(filepath);
+        placement.controller.handle_load_scores_from_file(filepath);
       });
 
       ipcRenderer.on('loadScoresFromSheets', function(e, sheetUrl) {
-        spa.controller.handle_load_scores_from_sheets(sheetUrl);
+        placement.controller.handle_load_scores_from_sheets(sheetUrl);
       });
     </script>
   </head>
   <body>
-    <div id="spa"></div>
+    <div id="placement_content_div"></div>
   </body>
 </html>

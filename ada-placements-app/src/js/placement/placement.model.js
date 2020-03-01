@@ -4,10 +4,10 @@ const parse = require('csv-parse/lib/sync');
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const solver = require("javascript-lp-solver/src/solver");
 const {google} = require('googleapis');
-const constants = require('../js/constants');
+const constants = require('../../js/placement/constants');
 
 
-spa.model = (function () {
+placement.model = (function () {
     let scores;
     let id_to_score;
     let solved_model;

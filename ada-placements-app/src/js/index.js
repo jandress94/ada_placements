@@ -3,7 +3,7 @@ const contextMenu = require('electron-context-menu');
 const path = require('path');
 const fs = require('fs');
 const {google} = require('googleapis');
-const constants = require('./constants');
+const constants = require('./placement/constants');
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -34,7 +34,7 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(true);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'index.html'));
+  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
@@ -101,7 +101,7 @@ function createAuthWindow(authUrl) {
     }
   });
 
-  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'googleAuth.html')).then(value => {
+  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'googleAuth.html')).then(value => {
     googleAuthWindow.webContents.send('authUrl', authUrl);
   });
 
@@ -148,7 +148,7 @@ function createGoogleSheetsURLWindow() {
     }
   });
 
-  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'googleSheetURL.html'));
+  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'placement', 'googleSheetURL.html'));
 
   // garbage collection
   googleSheetsURLWindow.on('close', function() {

@@ -1,7 +1,7 @@
 const electron_view = require('electron');
 
 
-spa.view = (function () {
+placement.view = (function () {
     let $container;
 
     const init_module = function ($c) {
@@ -26,7 +26,7 @@ spa.view = (function () {
         let overwrite_select = document.createElement('select');
         $(overwrite_select).change(function() {
             let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
-            spa.controller.handle_overwrite_changed(score_obj.id, new_val);
+            placement.controller.handle_overwrite_changed(score_obj.id, new_val);
         });
 
         let blank_option = document.createElement('option');
@@ -99,7 +99,7 @@ spa.view = (function () {
 
         calculate_button.appendChild(document.createTextNode('Calculate Placements!'));
         $(calculate_button).click(function() {
-            spa.controller.handle_calculate_button_clicked();
+            placement.controller.handle_calculate_button_clicked();
         });
     };
 
@@ -117,7 +117,7 @@ spa.view = (function () {
 
         recompute_button.appendChild(document.createTextNode('Recompute Placements'));
         $(recompute_button).click(function() {
-            spa.controller.handle_calculate_button_clicked();
+            placement.controller.handle_calculate_button_clicked();
         });
 
         let save_div = document.createElement('div');
@@ -128,7 +128,7 @@ spa.view = (function () {
 
         save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
         $(save_sheets_button).click(function() {
-            spa.controller.handle_save_sheets_button_clicked();
+            placement.controller.handle_save_sheets_button_clicked();
         });
 
         let save_csv_button = document.createElement('button');
@@ -136,7 +136,7 @@ spa.view = (function () {
 
         save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
         $(save_csv_button).click(function() {
-            spa.controller.handle_save_csv_button_clicked();
+            placement.controller.handle_save_csv_button_clicked();
         });
 
         let back_div = document.createElement('div');
@@ -147,7 +147,7 @@ spa.view = (function () {
 
         back_button.appendChild(document.createTextNode('Back to Scores'));
         $(back_button).click(function() {
-            spa.controller.handle_back_to_scores_button_clicked();
+            placement.controller.handle_back_to_scores_button_clicked();
         });
 
         let h1 = document.createElement('h1');
