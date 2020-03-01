@@ -34,7 +34,7 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(true);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(path.dirname(__dirname), 'index.html'));
+  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
@@ -101,7 +101,7 @@ function createAuthWindow(authUrl) {
     }
   });
 
-  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'googleAuth.html')).then(value => {
+  googleAuthWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'googleAuth.html')).then(value => {
     googleAuthWindow.webContents.send('authUrl', authUrl);
   });
 
@@ -148,7 +148,7 @@ function createGoogleSheetsURLWindow() {
     }
   });
 
-  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'googleSheetURL.html'));
+  googleSheetsURLWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'googleSheetURL.html'));
 
   // garbage collection
   googleSheetsURLWindow.on('close', function() {
@@ -178,13 +178,6 @@ function loadScoresFromSheets() {
     } else {
       getNewToken(oAuth2Client);
     }
-    // fs.readFile(TOKEN_PATH, (err, token) => {
-    //   if (err) {
-    //     getNewToken(oAuth2Client);
-    //   } else {
-    //     createGoogleSheetsURLWindow();
-    //   }
-    // });
   });
 }
 

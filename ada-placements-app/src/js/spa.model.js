@@ -4,7 +4,7 @@ const parse = require('csv-parse/lib/sync');
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const solver = require("javascript-lp-solver/src/solver");
 const {google} = require('googleapis');
-const constants = require('./js/constants');
+const constants = require('../js/constants');
 
 
 spa.model = (function () {
