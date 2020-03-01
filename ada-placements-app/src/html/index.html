@@ -10,10 +10,17 @@
 
     <script src="../js/jq/jquery-3.4.1.js"></script>
 
+    <script src="../js/renderer_imports.js"></script>
+
     <script src="../js/placement/placement.js"></script>
     <script src="../js/placement/placement.model.js"></script>
     <script src="../js/placement/placement.controller.js"></script>
     <script src="../js/placement/placement.view.js"></script>
+
+    <script src="../js/scheduler/scheduler.js"></script>
+    <script src="../js/scheduler/scheduler.model.js"></script>
+    <script src="../js/scheduler/scheduler.controller.js"></script>
+    <script src="../js/scheduler/scheduler.view.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
@@ -22,7 +29,9 @@
       const {ipcRenderer} = electron;
 
       $(document).ready(function(){
-        placement.init_module($('#content_div'));
+        let $content_div = $('#content_div');
+        placement.init_module($content_div);
+        scheduler.init_module($content_div);
       });
 
       ipcRenderer.on('placement.loadScoresFromFile', function(e, filepath) {
@@ -31,6 +40,10 @@
 
       ipcRenderer.on('placement.loadScoresFromSheets', function(e, sheetUrl) {
         placement.controller.handle_load_scores_from_sheets(sheetUrl);
+      });
+
+      ipcRenderer.on('scheduler.loadConfigJSON', function(e, configUrl) {
+        scheduler.controller.handle_load_config_json(configUrl);
       });
     </script>
   </head>
