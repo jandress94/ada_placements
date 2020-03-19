@@ -9,7 +9,7 @@ placement.model = (function () {
         id_to_score = null;
         solved_model = null;
 
-        fs.readFile(constants.GOOGLE_CREDENTIALS_PATH, (err, credentials) => {
+        fs.readFile(placement.constants.GOOGLE_CREDENTIALS_PATH, (err, credentials) => {
             if (err) return console.log('Error loading client secret file:', err);
 
             const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
@@ -88,7 +88,7 @@ placement.model = (function () {
     };
 
     const load_scores_from_sheets = function (sheetUrl) {
-        let token = fs.readFileSync(constants.TOKEN_PATH);
+        let token = fs.readFileSync(placement.constants.TOKEN_PATH);
 
         oAuth2Client.setCredentials(JSON.parse(token));
 
