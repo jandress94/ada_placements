@@ -127,12 +127,22 @@ scheduler.model = (function () {
 
                   // make sure each student interviews with at least n of their preferences
                   let cnstrt_student_pref = "c8_" + student.name;
-                  constraints[cnstrt_student_pref] = { min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED] };
+                  constraints[cnstrt_student_pref] = {
+                      min: Math.min(
+                          config[scheduler.constants.SETTINGS][scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
+                          student.preferences.length
+                      )
+                  };
                   variables[var_name][cnstrt_student_pref] = is_student_pref ? 1 : 0;
 
                   // make sure each team interviews with at least n of their preferences
                   let cnstrt_team_pref = "c9_" + team.name;
-                  constraints[cnstrt_team_pref] = { min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions };
+                  constraints[cnstrt_team_pref] = {
+                      min: Math.min(
+                          config[scheduler.constants.SETTINGS][scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
+                          team.preferences.length
+                      )
+                  };
                   variables[var_name][cnstrt_team_pref] = is_team_pref ? 1 : 0;
 
                   // if preferences align, make sure interview occurs
