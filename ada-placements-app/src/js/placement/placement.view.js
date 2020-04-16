@@ -59,7 +59,11 @@ placement.view = (function () {
     const _create_table_for_scores = function (scores) {
         let scores_table = document.createElement('table');
 
+        let scores_table_head = document.createElement('thead');
+        scores_table.append(scores_table_head);
+
         let header_row = document.createElement('tr');
+        scores_table_head.append(header_row);
 
         let col_names = ['person', 'company', 'score', 'overwrites'];
         for (let i = 0; i < col_names.length; i++) {
@@ -68,8 +72,9 @@ placement.view = (function () {
             header.appendChild(document.createTextNode(column_name));
             header_row.appendChild(header);
         }
-        scores_table.append(header_row);
 
+        let scores_table_body = document.createElement('tbody');
+        scores_table.appendChild(scores_table_body);
         for (let i = 0; i < scores.length; i++) {
             let row = document.createElement('tr');
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].person)));
@@ -78,8 +83,11 @@ placement.view = (function () {
 
             row.appendChild(_create_table_entry(_create_overwrite_select(scores[i])));
 
-            scores_table.appendChild(row);
+            scores_table_body.appendChild(row);
         }
+
+        $(scores_table).tablesorter();
+
         return scores_table;
     };
 
