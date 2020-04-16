@@ -1,3 +1,26 @@
 module.exports = {
-    SETTINGS: "settings"
+    SETTINGS: "settings",
+    COMPANIES: "companies",
+    TIMESLOTS: "timeslots",
+    STUDENTS: "students",
+    OVERRIDES: "overrides",
+
+    MAX_INTERVIEW_PER_STUDENT: "max_interviews_per_student",
+    DEFAULT_MAX_INTERVIEW_PER_STUDENT: 3,
+    MIN_INTERVIEW_PER_STUDENT: "min_interviews_per_student",
+    DEFAULT_MIN_INTERVIEW_PER_STUDENT: 3,
+    MIN_INTERVIEW_PER_INTERVIEWER: "min_interviews_per_interviewer",
+    DEFAULT_MIN_INTERVIEW_PER_INTERVIEWER: 3,
+    MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT: "max_interviews_at_company_per_student",
+    DEFAULT_MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT: 1,
+    MIN_STUDENT_PREFS_GUARANTEED: "min_student_prefs_guaranteed",
+    DEFAULT_MIN_STUDENT_PREFS_GUARANTEED: 1,
+    MIN_TEAM_PREFS_GUARANTEED_PER_POSITION: "min_team_prefs_guaranteed_per_position",
+    DEFAULT_MIN_TEAM_PREFS_GUARANTEED_PER_POSITION: 1,
+    REQUIRE_MUTUAL_PREFS_TO_INTERVIEW: "require_mutual_pres_to_interview",
+    DEFAULT_REQUIRE_MUTUAL_PREFS_TO_INTERVIEW: true,
+    TIME_WINDOW_SIZE: "time_window_size",
+    DEFAULT_TIME_WINDOW_SIZE: 3,
+    MAX_INTERVIEW_PER_TIME_WINDOW: "max_interviews_per_time_window",
+    DEFAULT_MAX_INTERVIEW_PER_TIME_WINDOW: 2,
 };
