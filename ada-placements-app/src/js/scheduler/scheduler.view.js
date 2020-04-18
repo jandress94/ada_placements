@@ -13,17 +13,20 @@ scheduler.view = (function () {
         $container.append(document.createTextNode(JSON.stringify(x)));
     };
 
-    const _create_num_setting = function (settings, setting_key, setting_text) {
+    const _create_num_setting = function (settings, setting_key, setting_text, step_val) {
         let setting_container = document.createElement('div');
 
         let setting_elem = document.createElement('input');
         setting_elem.setAttribute("type", "number");
-        setting_elem.setAttribute("step", "1");
-        setting_elem.setAttribute("min", "0");
+
+        if (step_val === undefined) {
+            step_val = "any";
+        }
+        setting_elem.setAttribute("step", step_val.toString());
         setting_elem.value = settings[setting_key];
 
         $(setting_elem).change(function() {
-            scheduler.controller.handle_setting_change(setting_key, parseInt(setting_elem.value));
+            scheduler.controller.handle_setting_change(setting_key, Number(setting_elem.value));
         });
 
         let setting_label = document.createElement("label");
@@ -78,22 +81,46 @@ scheduler.view = (function () {
         let override_div = document.createElement('div');
         $container.append(override_div);
 
-        /***************************settings***************************/
+        /***************************settings (constraints)***************************/
 
         let settings_div = document.createElement('div');
         $container.append(settings_div);
 
         let settings = config.settings;
 
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_INTERVIEW_PER_STUDENT,"Min Interviews per Student"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEW_PER_STUDENT,"Max Interviews per Student"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER,"Min Interviews per Interviewer"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT,"Max Interviews at Company per Student"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED,"Min Student Preferences Guaranteed"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION,"Min Team Preferences Guaranteed per Position"));
-        settings_div.appendChild(_create_bool_setting(settings, scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW,"Require Mutual Preferences to Interview"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.TIME_WINDOW_SIZE,"Time Window Size"));
-        settings_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW,"Max Interviews per Time Window per Student"));
+        let constraint_div = document.createElement('div');
+        settings_div.appendChild(constraint_div);
+
+        let constraints_h1 = document.createElement('h1');
+        constraints_h1.appendChild(document.createTextNode('Constraint Settings'));
+        constraint_div.appendChild(constraints_h1);
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_INTERVIEW_PER_STUDENT,"Min Interviews per Student", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEW_PER_STUDENT,"Max Interviews per Student", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER,"Min Interviews per Interviewer", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT,"Max Interviews at Company per Student", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED,"Min Student Preferences Guaranteed", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION,"Min Team Preferences Guaranteed per Position", 1));
+        constraint_div.appendChild(_create_bool_setting(settings, scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW,"Require Mutual Preferences to Interview"));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.TIME_WINDOW_SIZE,"Time Window Size", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW,"Max Interviews per Time Window per Student", 1));
+
+        /***************************settings (scoring)***************************/
+
+        let scoring_div = document.createElement('div');
+        settings_div.appendChild(scoring_div);
+
+        let scoring_h1 = document.createElement('h1');
+        scoring_h1.appendChild(document.createTextNode('Scoring Settings'));
+        scoring_div.appendChild(scoring_h1);
+        // Todo: change strings
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.DIFFICULTY_DIFF_2_SCORE,"Student - Team Difficulty Score 2"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.DIFFICULTY_DIFF_1_SCORE,"Student - Team Difficulty Score 1"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.DIFFICULTY_DIFF_0_SCORE,"Student - Team Difficulty Score 0"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE,"Student - Team Difficulty Score -1"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE,"Student - Team Difficulty Score -2"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_STUDENT_PREF_SCORE,"Student Preference Score"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_TEAM_PREF_SCORE,"Team Preference Score"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_MUTUAL_PREF_SCORE,"Mutual Preference Score"));
         /***************************calculate button***************************/
 
         let calculate_div = document.createElement('div');
@@ -151,7 +178,7 @@ scheduler.view = (function () {
         schedule_table_head.appendChild(header_row);
 
         let col_names = ['student name', 'company name', 'team name', 'interviewer name', 'timeslot',
-            'is student preference?', 'is team preference?', 'score', 'override'];
+            'is student preference?', 'is team preference?', 'student - team difficulty', 'score', 'override'];
         for (let i = 0; i < col_names.length; i++) {
             let column_name = col_names[i];
             let header = document.createElement('th');
@@ -170,6 +197,7 @@ scheduler.view = (function () {
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].timeslot)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_student_pref)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_team_pref)));
+            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].difficulty_diff)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].score)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_override)));
             schedule_table_body.appendChild(row);

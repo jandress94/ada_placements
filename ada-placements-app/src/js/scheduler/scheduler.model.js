@@ -77,6 +77,28 @@ scheduler.model = (function () {
                   let is_student_pref = student.preferences.indexOf(team.name) > -1;
                   let is_team_pref = team.preferences.indexOf(student.name) > -1;
 
+                  let score = 0;
+                  if (is_student_pref && is_team_pref) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_MUTUAL_PREF_SCORE];
+                  } else if (is_student_pref) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_STUDENT_PREF_SCORE];
+                  } else if (is_team_pref) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_TEAM_PREF_SCORE];
+                  }
+
+                  let difficulty_diff = student.difficulty - team.difficulty;
+                  if (difficulty_diff === 2) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_2_SCORE];
+                  } else if (difficulty_diff === 1) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_1_SCORE];
+                  } else if (difficulty_diff === 0) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_0_SCORE];
+                  } else if (difficulty_diff === -1) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE];
+                  } else if (difficulty_diff === -2) {
+                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
+                  }
+
                   variables[var_name] = {
                     student_name: student.name,
                     company_name: company.name,
@@ -85,7 +107,8 @@ scheduler.model = (function () {
                     timeslot: timeslot,
                     is_student_pref: is_student_pref,
                     is_team_pref: is_team_pref,
-                    score: Math.random()
+                    difficulty_diff: difficulty_diff,
+                    score: score
                   };
 
                   intVars[var_name] = 1;
@@ -174,6 +197,8 @@ scheduler.model = (function () {
           }
         }
 
+        console.log(config);
+
         let model_input = {
             optimize: 'score',
             opType: 'max',
@@ -207,6 +232,7 @@ scheduler.model = (function () {
                         timeslot: variables[key].timeslot,
                         is_student_pref: variables[key].is_student_pref,
                         is_team_pref: variables[key].is_team_pref,
+                        difficulty_diff: variables[key].difficulty_diff,
                         is_override: variables[key].is_override,
                         score: variables[key].score
                     });
@@ -224,6 +250,8 @@ scheduler.model = (function () {
 
         _add_val_if_not_exists(config, scheduler.constants.SETTINGS, {});
         const settings = config[scheduler.constants.SETTINGS];
+
+        // constraints
 
         _add_val_if_not_exists(settings, scheduler.constants.MAX_INTERVIEW_PER_STUDENT,
             scheduler.constants.DEFAULT_MAX_INTERVIEW_PER_STUDENT);
@@ -251,6 +279,32 @@ scheduler.model = (function () {
 
         _add_val_if_not_exists(settings, scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW,
             scheduler.constants.DEFAULT_MAX_INTERVIEW_PER_TIME_WINDOW);
+
+        // scoring
+
+        _add_val_if_not_exists(settings, scheduler.constants.DIFFICULTY_DIFF_2_SCORE,
+            scheduler.constants.DEFAULT_DIFFICULTY_DIFF_2_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.DIFFICULTY_DIFF_1_SCORE,
+            scheduler.constants.DEFAULT_DIFFICULTY_DIFF_1_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.DIFFICULTY_DIFF_0_SCORE,
+            scheduler.constants.DEFAULT_DIFFICULTY_DIFF_0_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE,
+            scheduler.constants.DEFAULT_DIFFICULTY_DIFF_MINUS1_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE,
+            scheduler.constants.DEFAULT_DIFFICULTY_DIFF_MINUS2_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.IS_STUDENT_PREF_SCORE,
+            scheduler.constants.DEFAULT_IS_STUDENT_PREF_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.IS_TEAM_PREF_SCORE,
+            scheduler.constants.DEFAULT_IS_TEAM_PREF_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.IS_MUTUAL_PREF_SCORE,
+            scheduler.constants.DEFAULT_IS_MUTUAL_PREF_SCORE);
     };
 
     const load_config_json = function (configUrl) {
