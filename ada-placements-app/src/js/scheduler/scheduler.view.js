@@ -209,6 +209,7 @@ scheduler.view = (function () {
 
     return {
         init_module: init_module,
+        clear_container: clear_container,
         display_configs: display_configs,
         display_schedule: display_schedule,
         display_raw: display_raw

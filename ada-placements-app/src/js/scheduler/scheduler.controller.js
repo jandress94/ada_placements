@@ -5,9 +5,15 @@ scheduler.controller = (function () {
     };
 
     const handle_calculate_button_clicked = function() {
-        let solved_model = scheduler.model.get_solved_model();
-        scheduler.view.display_schedule(solved_model);
-        // scheduler.view.display_raw(solved_model);
+        scheduler.view.clear_container();
+        scheduler.model.get_solved_model()
+            .then(function(solved_model) {
+                scheduler.view.display_schedule(solved_model)
+            })
+            .catch(function (err) {
+                alert(err);
+                scheduler.view.display_configs(scheduler.model.get_config());
+            });
     };
 
     const handle_setting_change = function (setting_key, new_val) {

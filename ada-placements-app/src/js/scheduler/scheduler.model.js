@@ -1,17 +1,27 @@
 scheduler.model = (function () {
     let config;
     let solved_model;
+    let _var_name_to_data_map;
 
     const init_module = function () {
         config = null;
         solved_model = null;
+        _var_name_to_data_map = null;
     };
 
     const get_solved_model = function () {
-        if (solved_model == null) {
-            _solve_model();
-        }
-        return solved_model;
+        return new Promise((resolve, reject) => {
+            if (solved_model == null) {
+                return _solve_model()
+                    .then(function() {
+                        return resolve(solved_model);
+                    })
+                    .catch(function(err) {
+                        return reject(err);
+                    })
+            }
+            return resolve(solved_model);
+        });
     };
 
     const _get_override_val = function(overrides, person_name, team_name) {
@@ -49,196 +59,324 @@ scheduler.model = (function () {
         return timeslot_to_window_map;
     };
 
-    const _solve_model = function () {
-        let variables = {};
-        let constraints = {};
-        let intVars = {};
+    const _create_cnstrt_and_push = function(c_map, c, c_key, v, limits) {
+        if (!c_map[c].hasOwnProperty(c_key)) {
+            c_map[c][c_key] = {
+                limits: limits,
+                vars: []
+            };
+        }
+        c_map[c][c_key].vars.push(v);
+    };
+
+    const _create_ampl_model = function () {
+        _var_name_to_data_map = {};
 
         let company_configs = config[scheduler.constants.COMPANIES];
         let student_configs = config[scheduler.constants.STUDENTS];
         let timeslot_to_window_map = _create_window_mappings(config[scheduler.constants.TIMESLOTS]);
 
-        for (let idx_company = 0; idx_company < company_configs.length; idx_company++) {
-          let company = company_configs[idx_company];
-
-          for (let idx_team = 0; idx_team < company.teams.length; idx_team++) {
-            let team = company.teams[idx_team];
-        
-            for (let idx_int = 0; idx_int < team.interviewers.length; idx_int++) {
-              let interviewer = team.interviewers[idx_int];
-
-              for (let idx_slot = 0; idx_slot < interviewer.timeslots.length; idx_slot++) {
-                let timeslot = interviewer.timeslots[idx_slot];
-
-                for (let idx_student = 0; idx_student < student_configs.length; idx_student++) {
-                  let student = student_configs[idx_student];
-
-                  let var_name = "var_" + student.name + "_" + interviewer.name + "_" + timeslot;
-                  let is_student_pref = student.preferences.indexOf(team.name) > -1;
-                  let is_team_pref = team.preferences.indexOf(student.name) > -1;
-
-                  let score = 0;
-                  if (is_student_pref && is_team_pref) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_MUTUAL_PREF_SCORE];
-                  } else if (is_student_pref) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_STUDENT_PREF_SCORE];
-                  } else if (is_team_pref) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_TEAM_PREF_SCORE];
-                  }
-
-                  let difficulty_diff = student.difficulty - team.difficulty;
-                  if (difficulty_diff === 2) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_2_SCORE];
-                  } else if (difficulty_diff === 1) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_1_SCORE];
-                  } else if (difficulty_diff === 0) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_0_SCORE];
-                  } else if (difficulty_diff === -1) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE];
-                  } else if (difficulty_diff === -2) {
-                      score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
-                  }
-
-                  variables[var_name] = {
-                    student_name: student.name,
-                    company_name: company.name,
-                    team_name: team.name,
-                    interviewer_name: interviewer.name,
-                    timeslot: timeslot,
-                    is_student_pref: is_student_pref,
-                    is_team_pref: is_team_pref,
-                    difficulty_diff: difficulty_diff,
-                    score: score
-                  };
-
-                  intVars[var_name] = 1;
-
-                  // make sure each student interviews with at most n teams
-                  let cnstrt_student_interviews_max = "c1_" + student.name;
-                  constraints[cnstrt_student_interviews_max] = { max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_STUDENT] };
-                  variables[var_name][cnstrt_student_interviews_max] = 1;
-
-                  // make sure each student interviews with at least n teams
-                  let cnstrt_student_interviews_min = "c2_" + student.name;
-                  constraints[cnstrt_student_interviews_min] = { min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_STUDENT] };
-                  variables[var_name][cnstrt_student_interviews_min] = 1;
-
-                  // make sure each interviewer has each slot filled at most once
-                  let cnstrt_interviewer_slot_once = "c3_" + interviewer.name + "_" + timeslot;
-                  constraints[cnstrt_interviewer_slot_once] = { max: 1 };
-                  variables[var_name][cnstrt_interviewer_slot_once] = 1;
-
-                  // make sure each interviewer has at least n interviews
-                  let cnstrt_interviewer_min_interviews = "c4_" + interviewer.name;
-                  constraints[cnstrt_interviewer_min_interviews] = { min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER] };
-                  variables[var_name][cnstrt_interviewer_min_interviews] = 1;
-
-                  // make sure each student is in each timestot at most once
-                  let cnstrt_student_slot = "c5_" + student.name + "_" + timeslot;
-                  constraints[cnstrt_student_slot] = { max: 1 };
-                  variables[var_name][cnstrt_student_slot] = 1;
-
-                  // make sure each student interviews with each company at most n times
-                  let cnstrt_student_company = "c6_" + student.name + "_" + company.name;
-                  constraints[cnstrt_student_company] = { max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT] };
-                  variables[var_name][cnstrt_student_company] = 1;
-
-                  // make sure each student interviews with each team at most once
-                  let cnstrt_student_team = "c7_" + student.name + "_" + team.name;
-                  constraints[cnstrt_student_team] = { max: 1 };
-                  variables[var_name][cnstrt_student_team] = 1;
-
-                  // make sure each student interviews with at least n of their preferences
-                  let cnstrt_student_pref = "c8_" + student.name;
-                  constraints[cnstrt_student_pref] = {
-                      min: Math.min(
-                          config[scheduler.constants.SETTINGS][scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
-                          student.preferences.length
-                      )
-                  };
-                  variables[var_name][cnstrt_student_pref] = is_student_pref ? 1 : 0;
-
-                  // make sure each team interviews with at least n of their preferences
-                  let cnstrt_team_pref = "c9_" + team.name;
-                  constraints[cnstrt_team_pref] = {
-                      min: Math.min(
-                          config[scheduler.constants.SETTINGS][scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
-                          team.preferences.length
-                      )
-                  };
-                  variables[var_name][cnstrt_team_pref] = is_team_pref ? 1 : 0;
-
-                  // if preferences align, make sure interview occurs
-                  if (config[scheduler.constants.SETTINGS][scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW]) {
-                      let cnstrt_pref_aligned = "c10_" + student.name + "_" + team.name;
-                      constraints[cnstrt_pref_aligned] = {min: (is_student_pref && is_team_pref) ? 1 : 0};
-                      variables[var_name][cnstrt_pref_aligned] = 1;
-                  }
-
-                  // add in overwrites
-                  let cnstrt_overwrite = "c11_" + student.name + "_" + team.name;
-                  let over_val = _get_override_val(config[scheduler.constants.OVERRIDES], student.name, team.name);
-                  if (over_val != null) {
-                    constraints[cnstrt_overwrite] = { equal: over_val ? 1 : 0 };
-                    variables[var_name]['is_override'] = over_val;
-                  }
-                  variables[var_name][cnstrt_overwrite] = 1;
-
-                  // time windows
-                  for (let idx_window = 0; idx_window < timeslot_to_window_map[timeslot].length; idx_window++) {
-                    let window = timeslot_to_window_map[timeslot][idx_window];
-                    let constrt_window = "c12_" + student.name + "_" + window;
-                    constraints[constrt_window] = { max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW] };
-                    variables[var_name][constrt_window] = 1;
-                  }
-                }
-              }
-            }
-          }
+        let var_names = [];
+        let score_terms = [];
+        let constraints_map = {};
+        for (let i = 1; i <= 11; i++) {
+            constraints_map['c' + i] = {};
         }
 
-        console.log(config);
+        for (let idx_student = 0; idx_student < student_configs.length; idx_student++) {
+            let student = student_configs[idx_student];
 
-        let model_input = {
-            optimize: 'score',
-            opType: 'max',
-            constraints: constraints,
-            variables: variables,
-            ints: intVars
-        };
-        let solved_model_raw = solver.Solve(model_input);
+            for (let idx_company = 0; idx_company < company_configs.length; idx_company++) {
+                let company = company_configs[idx_company];
 
-        console.log(solved_model_raw);
+                for (let idx_team = 0; idx_team < company.teams.length; idx_team++) {
+                    let team = company.teams[idx_team];
 
-        solved_model = {
-            is_feasible: solved_model_raw.feasible
-        };
+                    for (let idx_int = 0; idx_int < team.interviewers.length; idx_int++) {
+                        let interviewer = team.interviewers[idx_int];
 
-        if (solved_model_raw.feasible) {
-            solved_model.score = solved_model_raw.result;
-            solved_model.schedule = [];
+                        for (let idx_slot = 0; idx_slot < interviewer.timeslots.length; idx_slot++) {
+                            let timeslot = interviewer.timeslots[idx_slot];
 
-            for (const key in solved_model_raw) {
-                if (!solved_model_raw.hasOwnProperty(key)) {
+                            let s_name = student.name.replace(/ /g, "");
+                            let c_name = company.name.replace(/ /g, "");
+                            let t_name = team.name.replace(/ /g, "");
+                            let i_name = interviewer.name.replace(/ /g, "");
+
+                            let var_name = "var_" + s_name + "_" + i_name + "_" + timeslot;
+                            var_names.push(var_name);
+
+                            let is_student_pref = student.preferences.indexOf(team.name) > -1;
+                            let is_team_pref = team.preferences.indexOf(student.name) > -1;
+
+                            let over_val = _get_override_val(config[scheduler.constants.OVERRIDES], s_name, t_name);
+
+                            let score = 0;
+                            if (is_student_pref && is_team_pref) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_MUTUAL_PREF_SCORE];
+                            } else if (is_student_pref) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_STUDENT_PREF_SCORE];
+                            } else if (is_team_pref) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_TEAM_PREF_SCORE];
+                            }
+
+                            let difficulty_diff = student.difficulty - team.difficulty;
+                            if (difficulty_diff === 2) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_2_SCORE];
+                            } else if (difficulty_diff === 1) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_1_SCORE];
+                            } else if (difficulty_diff === 0) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_0_SCORE];
+                            } else if (difficulty_diff === -1) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE];
+                            } else if (difficulty_diff === -2) {
+                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
+                            }
+
+                            _var_name_to_data_map[var_name] = {
+                                student_name: student.name,
+                                company_name: company.name,
+                                team_name: team.name,
+                                interviewer_name: interviewer.name,
+                                timeslot: timeslot,
+                                is_student_pref: is_student_pref,
+                                is_team_pref: is_team_pref,
+                                difficulty_diff: difficulty_diff,
+                                is_override: over_val,
+                                score: score
+                            };
+
+                            score_terms.push(score + " * " + var_name);
+
+                            // make sure each student interviews with at least n teams and at most m teams
+                            _create_cnstrt_and_push(constraints_map, 'c1', s_name, var_name,
+                                {
+                                    min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_STUDENT],
+                                    max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_STUDENT]
+                                }
+                            );
+
+                            // make sure each interviewer has each slot filled at most once
+                            _create_cnstrt_and_push(constraints_map, 'c2', i_name + "_" + timeslot, var_name, { max: 1 });
+
+                            // make sure each interviewer has at least n interviews
+                            _create_cnstrt_and_push(constraints_map, 'c3', i_name, var_name,
+                                {
+                                    min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER]
+                                }
+                            );
+
+                            // make sure each student is in each timestot at most once
+                            _create_cnstrt_and_push(constraints_map, 'c4', s_name + "_" + timeslot, var_name, { max: 1 });
+
+                            // make sure each student interviews with each company at most n times
+                            _create_cnstrt_and_push(constraints_map, 'c5', s_name + "_" + c_name, var_name,
+                                {
+                                        max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT]
+                                }
+                            );
+
+                            // make sure each student interviews with each team at most once
+                            _create_cnstrt_and_push(constraints_map, 'c6', s_name + "_" + t_name, var_name, { max: 1 });
+
+                            // make sure each student interviews with at least n of their preferences
+                            if (is_student_pref) {
+                                _create_cnstrt_and_push(constraints_map, 'c7', s_name, var_name,
+                                    {
+                                        min: Math.min(
+                                            config[scheduler.constants.SETTINGS][scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
+                                            student.preferences.length
+                                        )
+                                    }
+                                );
+                            }
+
+                            // make sure each team interviews with at least n of their preferences
+                            if (is_team_pref) {
+                                _create_cnstrt_and_push(constraints_map, 'c8', t_name, var_name,
+                                    {
+                                        min: Math.min(
+                                            config[scheduler.constants.SETTINGS][scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
+                                            team.preferences.length
+                                        )
+                                    }
+                                );
+                            }
+
+                            // if preferences align, make sure interview occurs
+                            if (config[scheduler.constants.SETTINGS][scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref) {
+                                _create_cnstrt_and_push(constraints_map, 'c9', s_name + "_" + t_name, var_name, { min: 1 });
+                            }
+
+                            // add in overwrites
+                            if (over_val !== null){
+                                _create_cnstrt_and_push(constraints_map, 'c10', s_name + "_" + t_name, var_name, { equal: over_val ? 1 : 0 });
+                            }
+
+                            // time windows
+                            for (let idx_window = 0; idx_window < timeslot_to_window_map[timeslot].length; idx_window++) {
+                                let window = timeslot_to_window_map[timeslot][idx_window];
+                                _create_cnstrt_and_push(constraints_map, 'c11', s_name + "_" + window, var_name,
+                                    {
+                                        max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW]
+                                    }
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let model_data = '';
+
+        for (let i = 0; i < var_names.length; i++) {
+            model_data += '\nvar ' + var_names[i] + ' binary;';
+        }
+
+        model_data += '\nmaximize Score: ' + score_terms.join(' + ') + ";";
+
+        for (const c in constraints_map) {
+            if (!constraints_map.hasOwnProperty(c)) {
+                continue;
+            }
+
+            for (const c_key in constraints_map[c]) {
+                if (!constraints_map[c].hasOwnProperty(c_key)) {
                     continue;
                 }
 
-                if (variables.hasOwnProperty(key)) {
-                    solved_model.schedule.push({
-                        student_name: variables[key].student_name,
-                        company_name: variables[key].company_name,
-                        team_name: variables[key].team_name,
-                        interviewer_name: variables[key].interviewer_name,
-                        timeslot: variables[key].timeslot,
-                        is_student_pref: variables[key].is_student_pref,
-                        is_team_pref: variables[key].is_team_pref,
-                        difficulty_diff: variables[key].difficulty_diff,
-                        is_override: variables[key].is_override,
-                        score: variables[key].score
-                    });
+                let c_entry = constraints_map[c][c_key];
+
+                let c_str = '';
+                if (c_entry.limits.hasOwnProperty('min')) {
+                    c_str += c_entry.limits.min + " <= "
                 }
+                c_str += c_entry.vars.join(' + ');
+                if (c_entry.limits.hasOwnProperty('max')) {
+                    c_str += " <= " + c_entry.limits.max;
+                } else if (c_entry.limits.hasOwnProperty('equal')) {
+                    c_str += " = " + c_entry.limits['equal'];
+                }
+
+                model_data += '\nsubject to ' + c + "_" + c_key + ": " + c_str + ";";
             }
         }
+
+        return model_data;
+    };
+
+    const _parse_solved_model = function(data) {
+        let results = atob($(data.documentElement).find('base64').first().text());
+
+        let status_idx = results.indexOf('PRIMAL_FEASIBLE');
+
+        if (status_idx < 0) {
+            solved_model = {
+                is_feasible: false
+            };
+            return;
+        }
+
+        solved_model = {
+            is_feasible: true
+        };
+
+        // get the optimal score
+        let score_idx = results.indexOf('Primal objective');
+        let colon_idx = results.indexOf(':', score_idx);
+        let end_line_idx = results.indexOf('\n', colon_idx);
+        solved_model['score'] = Number(results.substring(colon_idx + 1, end_line_idx).trim());
+
+        // parse result lines
+        let lines = results.substr(results.indexOf('_varname', colon_idx)).split('\n');
+        let assigned_vars = [];
+        for (let i = 1; i < lines.length; i++) {
+            let l = lines[i].trim();
+            if (l.match(/^\d+\s+/) === null) {
+                break;
+            }
+
+            let l_split = l.split(/\s+/g);
+
+            if (l_split.length !== 2) {
+                alert(l_split);
+                break;
+            }
+
+            assigned_vars.push(l_split[1]);
+        }
+
+        solved_model.schedule = [];
+        for (let i = 0; i < assigned_vars.length; i++) {
+            solved_model.schedule.push(_var_name_to_data_map[assigned_vars[i]]);
+        }
+    };
+
+    const _get_solved_model = function(data) {
+        return new Promise((resolve, reject) => {
+            let $d = $(data.documentElement).find("data");
+
+            let job_num = $d.find('int').first().text();
+            let job_pwd = $d.find('string').first().text();
+
+            let xml_rpc_results_request = '<methodCall><methodName>getFinalResults</methodName><params><param><value><int>' +
+                job_num +
+                '</int></value></param><param><value><string>' +
+                job_pwd +
+                '</string></value></param></params></methodCall>';
+
+            $.post('https://neos-server.org:3333', xml_rpc_results_request)
+                .done(function(data) {
+                    _parse_solved_model(data);
+                    return resolve();
+                })
+                .fail(function(err) {
+                    return reject('Error getting job results: ' + JSON.stringify(err));
+                });
+        });
+    };
+
+    const _solve_model = function () {
+        return new Promise((resolve, reject) => {
+            let ampl_model = _create_ampl_model();
+
+            let job_xml = "<document>" +
+                "<category>milp</category>" +
+                "<solver>MOSEK</solver>" +
+                "<inputType>AMPL</inputType>" +
+                "<priority>long</priority>" +
+                "<email></email>" +
+                "<model><![CDATA[" +
+                ampl_model +
+                "]]></model>" +
+                "<data><![CDATA[]]></data>" +
+                "<commands><![CDATA[solve;\n" +
+                "option display_width 500, display_1col 500;" +
+                "display {j in 1.._nvars: _var[j] > 0.5} _varname[j];]]></commands>" +
+                "<comments><![CDATA[]]></comments>" +
+                "</document>"
+
+            job_xml = job_xml.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            let xml_rpc_submit_request = '<methodCall><methodName>submitJob</methodName><params><param><value><string>' +
+                job_xml +
+                '</string></value></param></params></methodCall>';
+
+            $.post('https://neos-server.org:3333', xml_rpc_submit_request)
+                .done(function(data) {
+                    _get_solved_model(data)
+                        .then(function() {
+                            return resolve();
+                        })
+                        .catch(function (err) {
+                            return reject(err);
+                        });
+                })
+                .fail(function(err) {
+                    return reject('Error submitting job: ' + JSON.stringify(err));
+                });
+        });
     };
     
     const _add_default_settings = function () {
@@ -314,6 +452,7 @@ scheduler.model = (function () {
 
     const update_setting = function (setting_key, new_val) {
         solved_model = null;
+        _var_name_to_data_map = null;
         config[scheduler.constants.SETTINGS][setting_key] = new_val;
     };
 
