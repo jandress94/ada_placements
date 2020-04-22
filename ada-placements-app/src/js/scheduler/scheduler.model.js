@@ -27,12 +27,35 @@ scheduler.model = (function () {
     const _get_override_val = function(overrides, person_name, team_name) {
         for (let i = 0; i < overrides.length; i++) {
             const over = overrides[i];
-            if (person_name === over.person && team_name === over.team) {
+            if (person_name === over.person.replace(/ /g, "") && team_name === over.team.replace(/ /g, "")) {
                 return over.value;
             }
         }
 
         return null;
+    };
+
+    const update_overwrite = function(student_name, team_name, new_val) {
+        solved_model = null;
+        _var_name_to_data_map = null;
+
+        let overrides = config[scheduler.constants.OVERRIDES];
+
+        for (let i = 0; i < overrides.length; i++) {
+            const over = overrides[i];
+            if (student_name === over.person && team_name === over.team) {
+                overrides.splice(i, 1);
+                break;
+            }
+        }
+
+        if (new_val !== null) {
+            config[scheduler.constants.OVERRIDES].push({
+                person: student_name,
+                team: team_name,
+                value: new_val
+            });
+        }
     };
 
     const _create_window_mappings = function (timeslots) {
@@ -465,6 +488,7 @@ scheduler.model = (function () {
         load_config_json: load_config_json,
         get_config: get_config,
         update_setting: update_setting,
-        get_solved_model: get_solved_model
+        get_solved_model: get_solved_model,
+        update_overwrite: update_overwrite
     };
 }());

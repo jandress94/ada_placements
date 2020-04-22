@@ -141,6 +141,40 @@ scheduler.view = (function () {
         return table_entry;
     };
 
+    const _create_overwrite_select = function(schedule_obj) {
+        let overwrite_select = document.createElement('select');
+        $(overwrite_select).change(function() {
+            let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
+            scheduler.controller.handle_overwrite_changed(schedule_obj.student_name, schedule_obj.team_name, new_val);
+        });
+
+        let blank_option = document.createElement('option');
+        blank_option.setAttribute('value', null);
+        overwrite_select.appendChild(blank_option);
+
+        let yes_option = document.createElement('option');
+        yes_option.setAttribute('value', true);
+        yes_option.appendChild(document.createTextNode('Yes'));
+        overwrite_select.appendChild(yes_option);
+
+        let no_option = document.createElement('option');
+        no_option.setAttribute('value', false);
+        no_option.appendChild(document.createTextNode('No'));
+        overwrite_select.appendChild(no_option);
+
+        if (schedule_obj.is_override === null) {
+            blank_option.setAttribute('selected', 'selected');
+        } else if (schedule_obj.is_override) {
+            yes_option.setAttribute('selected', 'selected');
+        } else if (!schedule_obj.is_override) {
+            no_option.setAttribute('selected', 'selected');
+        } else {
+            throw "Unknown overwrite value: " + schedule_obj.overwrite;
+        }
+
+        return overwrite_select;
+    };
+
     const display_schedule = function (solved_model) {
         clear_container();
 
@@ -199,7 +233,7 @@ scheduler.view = (function () {
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_team_pref)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].difficulty_diff)));
             row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].score)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_override)));
+            row.appendChild(_create_table_entry(_create_overwrite_select(solved_model.schedule[i])));
             schedule_table_body.appendChild(row);
         }
 
