@@ -81,6 +81,53 @@ scheduler.view = (function () {
         let override_div = document.createElement('div');
         $container.append(override_div);
 
+        let override_h1 = document.createElement('h1');
+        override_h1.appendChild(document.createTextNode('Overrides'));
+        override_div.appendChild(override_h1);
+
+        let override_table = document.createElement('table');
+        override_div.appendChild(override_table);
+
+        override_table.setAttribute('class', 'tablesorter');
+        let override_table_head = document.createElement('thead');
+        override_table.append(override_table_head);
+
+        let header_row = document.createElement('tr');
+        override_table_head.appendChild(header_row);
+
+        let col_names = ['student name', 'team name', 'override value', ''];
+        for (let i = 0; i < col_names.length; i++) {
+            let column_name = col_names[i];
+            let header = document.createElement('th');
+            header.appendChild(document.createTextNode(column_name));
+            header_row.appendChild(header);
+        }
+
+        let override_table_body = document.createElement('tbody');
+        override_table.appendChild(override_table_body);
+
+        const overrides = config[scheduler.constants.OVERRIDES];
+        for (let i = 0; i < overrides.length; i++) {
+            const over = overrides[i];
+
+            let row = document.createElement('tr');
+            row.appendChild(_create_table_entry(document.createTextNode(over.person)));
+            row.appendChild(_create_table_entry(document.createTextNode(over.team)));
+            row.appendChild(_create_table_entry(document.createTextNode(over.value)));
+
+            let del_button = document.createElement('button');
+            del_button.appendChild(document.createTextNode('Delete'));
+            $(del_button).click(function() {
+                scheduler.controller.handle_overwrite_changed(over.person, over.team, null);
+                scheduler.controller.display_config_page();
+            });
+            row.appendChild(_create_table_entry(del_button));
+
+            override_table_body.appendChild(row);
+        }
+
+        $(override_table).tablesorter();
+
         /***************************settings (constraints)***************************/
 
         let settings_div = document.createElement('div');
@@ -238,7 +285,6 @@ scheduler.view = (function () {
         }
 
         $(schedule_table).tablesorter();
-
     };
 
     return {
