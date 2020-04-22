@@ -228,6 +228,19 @@ scheduler.view = (function () {
         let schedule_div = document.createElement('div');
         $container.append(schedule_div);
 
+        // Recompute
+        let recompute_div = document.createElement('div');
+        $container.append(recompute_div);
+
+        let recompute_button = document.createElement('button');
+        recompute_div.appendChild(recompute_button);
+
+        recompute_button.appendChild(document.createTextNode('Recompute Schedule'));
+        $(recompute_button).click(function() {
+            scheduler.controller.handle_calculate_button_clicked();
+        });
+
+        // Back
         let back_div = document.createElement('div');
         $container.append(back_div);
 
