@@ -120,33 +120,10 @@ placement.view = (function () {
         let recompute_div = document.createElement('div');
         $container.append(recompute_div);
 
-        let recompute_button = document.createElement('button');
-        recompute_div.appendChild(recompute_button);
-
-        recompute_button.appendChild(document.createTextNode('Recompute Placements'));
-        $(recompute_button).click(function() {
-            placement.controller.handle_calculate_button_clicked();
-        });
-
         let save_div = document.createElement('div');
         $container.append(save_div);
 
-        let save_sheets_button = document.createElement('button');
-        save_div.appendChild(save_sheets_button);
-
-        save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
-        $(save_sheets_button).click(function() {
-            placement.controller.handle_save_sheets_button_clicked();
-        });
-
-        let save_csv_button = document.createElement('button');
-        save_div.appendChild(save_csv_button);
-
-        save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
-        $(save_csv_button).click(function() {
-            placement.controller.handle_save_csv_button_clicked();
-        });
-
+        // Back
         let back_div = document.createElement('div');
         $container.append(back_div);
 
@@ -167,6 +144,32 @@ placement.view = (function () {
         }
 
         h1.appendChild(document.createTextNode('Created Placements with Score ' + solved_model.score));
+
+        // Recompute
+        let recompute_button = document.createElement('button');
+        recompute_div.appendChild(recompute_button);
+
+        recompute_button.appendChild(document.createTextNode('Recompute Placements'));
+        $(recompute_button).click(function() {
+            placement.controller.handle_calculate_button_clicked();
+        });
+
+        // Saving
+        let save_sheets_button = document.createElement('button');
+        save_div.appendChild(save_sheets_button);
+
+        save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
+        $(save_sheets_button).click(function() {
+            placement.controller.handle_save_sheets_button_clicked();
+        });
+
+        let save_csv_button = document.createElement('button');
+        save_div.appendChild(save_csv_button);
+
+        save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
+        $(save_csv_button).click(function() {
+            placement.controller.handle_save_csv_button_clicked();
+        });
 
         placements_div.appendChild(_create_table_for_scores(solved_model.placements));
     };

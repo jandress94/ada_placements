@@ -188,7 +188,14 @@ placement.model = (function () {
         return values;
     };
 
+    // Todo: investigate failing save
     const save_placements_to_sheets = function() {
+        if (solved_model === null) {
+            return new Promise(((resolve, reject) => {
+                return reject("Cannot save because the placements have not been recomputed.");
+            }));
+        }
+
         const resource_create = {
             properties: {
                 title: 'Placements'
@@ -222,6 +229,10 @@ placement.model = (function () {
 
     const save_placements_to_csv = function() {
         return new Promise((resolve, reject) => {
+            if (solved_model === null) {
+                return reject("Cannot save because the placements have not been recomputed.");
+            }
+
             dialog.showSaveDialog({
                 filters: [
                     { name: 'CSV', extensions: ['csv'] }
