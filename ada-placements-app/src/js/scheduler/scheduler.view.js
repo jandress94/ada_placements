@@ -228,17 +228,11 @@ scheduler.view = (function () {
         let schedule_div = document.createElement('div');
         $container.append(schedule_div);
 
-        // Recompute
         let recompute_div = document.createElement('div');
         $container.append(recompute_div);
 
-        let recompute_button = document.createElement('button');
-        recompute_div.appendChild(recompute_button);
-
-        recompute_button.appendChild(document.createTextNode('Recompute Schedule'));
-        $(recompute_button).click(function() {
-            scheduler.controller.handle_calculate_button_clicked();
-        });
+        let save_div = document.createElement('div');
+        $container.append(save_div);
 
         // Back
         let back_div = document.createElement('div');
@@ -259,6 +253,32 @@ scheduler.view = (function () {
             h1.appendChild(document.createTextNode('No schedule possible.'));
             return;
         }
+
+        // Recompute
+        let recompute_button = document.createElement('button');
+        recompute_div.appendChild(recompute_button);
+
+        recompute_button.appendChild(document.createTextNode('Recompute Schedule'));
+        $(recompute_button).click(function() {
+            scheduler.controller.handle_calculate_button_clicked();
+        });
+
+        // Saving
+        let save_sheets_button = document.createElement('button');
+        save_div.appendChild(save_sheets_button);
+
+        save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
+        $(save_sheets_button).click(function() {
+            scheduler.controller.handle_save_sheets_button_clicked();
+        });
+
+        let save_csv_button = document.createElement('button');
+        save_div.appendChild(save_csv_button);
+
+        save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
+        $(save_csv_button).click(function() {
+            scheduler.controller.handle_save_csv_button_clicked();
+        });
 
         h1.appendChild(document.createTextNode('Created Schedule with Score ' + solved_model.score));
         let schedule_table = document.createElement('table');
