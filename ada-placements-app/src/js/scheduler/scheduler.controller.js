@@ -32,12 +32,30 @@ scheduler.controller = (function () {
         scheduler.model.update_overwrite(student_name, team_name, new_val);
     };
 
+    const handle_save_sheets_button_clicked = function () {
+        scheduler.model.save_schedule_to_sheets().then(function(successMsg) {
+            alert(successMsg);
+        }).catch(function(err) {
+            alert(err);
+        });
+    };
+
+    const handle_save_csv_button_clicked = function () {
+        scheduler.model.save_schedule_to_csv().then(function(successMsg) {
+            alert(successMsg);
+        }).catch(function(err) {
+            alert(err);
+        });
+    };
+
     return {
         handle_load_config_json: handle_load_config_json,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_setting_change: handle_setting_change,
         handle_back_to_configs_button_clicked: handle_back_to_configs_button_clicked,
         handle_overwrite_changed: handle_overwrite_changed,
-        display_config_page: display_config_page
+        display_config_page: display_config_page,
+        handle_save_sheets_button_clicked: handle_save_sheets_button_clicked,
+        handle_save_csv_button_clicked: handle_save_csv_button_clicked
     };
 }());

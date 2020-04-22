@@ -483,12 +483,26 @@ scheduler.model = (function () {
         return config;
     };
 
+    const save_schedule_to_sheets = function () {
+        return new Promise((resolve, reject) => {
+            return reject("Not Implemented");
+        });
+    };
+
+    const save_schedule_to_csv = function () {
+        return new Promise((resolve, reject) => {
+            return reject("Not Implemented");
+        });
+    };
+
     return {
         init_module: init_module,
         load_config_json: load_config_json,
         get_config: get_config,
         update_setting: update_setting,
         get_solved_model: get_solved_model,
-        update_overwrite: update_overwrite
+        update_overwrite: update_overwrite,
+        save_schedule_to_sheets: save_schedule_to_sheets,
+        save_schedule_to_csv: save_schedule_to_csv
     };
 }());
