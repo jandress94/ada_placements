@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const { dialog } = require('electron').remote
 const solver = require("javascript-lp-solver/src/solver");
 const parse = require('csv-parse/lib/sync');

@@ -1,7 +1,10 @@
 placement.controller = (function () {
     const handle_load_scores_from_file = function (filepath) {
-        placement.model.load_scores_from_file(filepath);
-        placement.view.display_scores_page(placement.model.get_scores());
+        console.log('before');
+        placement.model.load_scores_from_file(filepath)
+            .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+            .catch(alert);
+        console.log('after');
     };
 
     const handle_load_scores_from_sheets = function (sheetUrl) {
@@ -32,11 +35,13 @@ placement.controller = (function () {
     };
 
     const handle_save_csv_button_clicked = function () {
-        placement.model.save_placements_to_csv().then(function(successMsg) {
-            alert(successMsg);
-        }).catch(function(err) {
-            alert(err);
-        });
+        placement.model.save_placements_to_csv()
+            .then(save_state => {
+                if (save_state.state === 'success') {
+                    alert("Save successful");
+                }
+            })
+            .catch(err => alert(err));
     };
 
     return {

@@ -469,8 +469,11 @@ scheduler.model = (function () {
     };
 
     const load_config_json = function (configUrl) {
-        config = JSON.parse(fs.readFileSync(configUrl, 'utf8'));
-        _add_default_settings();
+        return fs.readFile(configUrl, 'utf8')
+            .then(configStr => {
+                config = JSON.parse(configStr);
+                _add_default_settings();
+            });
     };
 
     const update_setting = function (setting_key, new_val) {
@@ -483,6 +486,27 @@ scheduler.model = (function () {
         return config;
     };
 
+    const _save_schedule_to_array = function(schedule) {
+        let values = [['Student', 'Company', 'Team', 'Interviewer', 'Timeslot', 'Student Preference?', 'Team Preference?', 'Student - Team Difficulty', 'Score', 'Override']];
+        for (let i = 0; i < schedule.length; i++) {
+            let s = schedule[i];
+
+            values.push([
+                s.student_name,
+                s.company_name,
+                s.team_name,
+                s.interviewer_name,
+                s.timeslot,
+                s.is_student_pref.toString(),
+                s.is_team_pref.toString(),
+                s.difficulty_diff,
+                s.score,
+                s.is_override === null ? s.is_override : s.is_override.toString()
+            ]);
+        }
+        return values;
+    };
+
     const save_schedule_to_sheets = function () {
         return new Promise((resolve, reject) => {
             return reject("Not Implemented");
@@ -491,8 +515,13 @@ scheduler.model = (function () {
 
     const save_schedule_to_csv = function () {
         return new Promise((resolve, reject) => {
-            return reject("Not Implemented");
-        });
+            if (solved_model === null) {
+                reject("Cannot save because the schedule has not been recomputed.");
+            }
+            resolve(solved_model.schedule);
+        }).then(
+            schedule_data => util.saving.save_to_csv(() => _save_schedule_to_array(schedule_data))
+        );
     };
 
     return {

@@ -9,12 +9,12 @@ placement.model = (function () {
         id_to_score = null;
         solved_model = null;
 
-        fs.readFile(placement.constants.GOOGLE_CREDENTIALS_PATH, (err, credentials) => {
-            if (err) return console.log('Error loading client secret file:', err);
-
-            const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
-            oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-        });
+        fs.readFile(placement.constants.GOOGLE_CREDENTIALS_PATH)
+            .then(credentials => {
+                const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
+                oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+            })
+            .catch(err => console.log('Error loading client secret file: ' + err));
     };
 
     const get_scores = function () {
@@ -64,14 +64,15 @@ placement.model = (function () {
     };
     
     const load_scores_from_file = function (filepath) {
-        let data_csv_raw = fs.readFileSync(filepath);
-        let data_csv_parsed = parse(data_csv_raw.toString(), {
-           cast: true,
-           columns: false,
-           skip_empty_lines: true
-        });
-
-        _load_scores_from_array(data_csv_parsed);
+        return fs.readFile(filepath)
+            .then(data_csv_raw =>
+                parse(data_csv_raw.toString(), {
+                   cast: true,
+                   columns: false,
+                   skip_empty_lines: true
+                })
+            )
+            .then(data_csv_parsed => _load_scores_from_array(data_csv_parsed))
     };
 
     const _sheet_url_to_sheet_id = function (sheetUrl) {
@@ -182,7 +183,7 @@ placement.model = (function () {
                 s.company,
                 s.person_score,
                 s.company_score,
-                s.overwrite
+                s.overwrite === null ? s.overwrite : s.overwrite.toString()
             ]);
         }
         return values;
@@ -230,25 +231,12 @@ placement.model = (function () {
     const save_placements_to_csv = function() {
         return new Promise((resolve, reject) => {
             if (solved_model === null) {
-                return reject("Cannot save because the placements have not been recomputed.");
+                reject("Cannot save because the placements have not been recomputed.");
             }
-
-            dialog.showSaveDialog({
-                filters: [
-                    { name: 'CSV', extensions: ['csv'] }
-                ]
-            }).then(result => {
-                if (!result.canceled) {
-                    fs.writeFile(result.filePath, convertArrayToCSV(_save_placements_to_array(solved_model.placements)), function(err) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve("File Saved");
-                        }
-                    });
-                }
-            });
-        });
+            resolve(solved_model.placements);
+        }).then(
+            placements_data => util.saving.save_to_csv(() => _save_placements_to_array(placements_data))
+        );
     };
 
     return {

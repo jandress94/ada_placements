@@ -1,7 +1,7 @@
 scheduler.controller = (function () {
     const handle_load_config_json = function (configUrl) {
-        scheduler.model.load_config_json(configUrl);
-        display_config_page();
+        scheduler.model.load_config_json(configUrl)
+            .then(() => display_config_page());
     };
 
     const display_config_page = function() {
@@ -41,11 +41,13 @@ scheduler.controller = (function () {
     };
 
     const handle_save_csv_button_clicked = function () {
-        scheduler.model.save_schedule_to_csv().then(function(successMsg) {
-            alert(successMsg);
-        }).catch(function(err) {
-            alert(err);
-        });
+        scheduler.model.save_schedule_to_csv()
+            .then(save_state => {
+                if (save_state.state === 'success') {
+                    alert("Save successful");
+                }
+            })
+            .catch(err => alert(err));
     };
 
     return {
