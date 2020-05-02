@@ -3,6 +3,26 @@ placement.controller = (function () {
         return placement.view.get_landing_generator_fn();
     };
 
+    const handle_load_file = function () {
+        dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [{ name: 'CSV', extensions: ['csv'] }]
+        })
+            .then(result => {
+                if (!result.canceled) {
+                    return fs.readFile(result.filePaths[0], 'utf8')
+                        .then(data_csv_raw => parse(data_csv_raw.toString(), {
+                            cast: true,
+                            columns: false,
+                            skip_empty_lines: true
+                        }))
+                        .then(placement.model.load_scores_from_array)
+                        .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+                        .catch(alert);
+                }
+            });
+    };
+
     const handle_load_scores_from_file = function (filepath) {
         console.log('before');
         placement.model.load_scores_from_file(filepath)
@@ -50,6 +70,7 @@ placement.controller = (function () {
 
     return {
         get_landing_generator_fn: get_landing_generator_fn,
+        handle_load_file: handle_load_file,
         handle_load_scores_from_file: handle_load_scores_from_file,
         handle_load_scores_from_sheets: handle_load_scores_from_sheets,
         handle_overwrite_changed: handle_overwrite_changed,

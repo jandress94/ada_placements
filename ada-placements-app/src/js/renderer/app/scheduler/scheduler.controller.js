@@ -13,7 +13,8 @@ scheduler.controller = (function () {
                     return fs.readFile(result.filePaths[0], 'utf8')
                             .then(JSON.parse)
                             .then(scheduler.model.set_config)
-                            .then(display_config_page);
+                            .then(display_config_page)
+                            .catch(alert);
                 }
             });
     };

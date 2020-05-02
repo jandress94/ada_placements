@@ -1,9 +1,13 @@
 const placement = (function () {
 
     const init_module = function ($container, ipcRenderer) {
-        placement.constants = require('../js/app/placement/constants');
+        placement.constants = require('../js/renderer/app/placement/constants');
         placement.model.init_module();
         placement.view.init_module($container);
+
+        ipcRenderer.on('placement.loadScoresFile', function(e) {
+            placement.controller.handle_load_file();
+        });
     };
 
     const get_landing_generator_fn = function () {

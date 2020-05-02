@@ -3,7 +3,7 @@
   "productName": "ada-placements-app",
   "version": "0.1.0",
   "description": "Create Internship Placements for Ada Developers Academy",
-  "main": "src/js/index.js",
+  "main": "src/js/main/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",

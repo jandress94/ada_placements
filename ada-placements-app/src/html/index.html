@@ -8,30 +8,30 @@
 
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-    <script src="../js/jq/jquery-3.4.1.js"></script>
-    <script src="../js/jq/jquery.tablesorter.js"></script>
+    <script src="../js/renderer/jq/jquery-3.4.1.js"></script>
+    <script src="../js/renderer/jq/jquery.tablesorter.js"></script>
 
-    <script src="../js/renderer_imports.js"></script>
+    <script src="../js/renderer/renderer_imports.js"></script>
 
-    <script src="../js/util/util.js"></script>
-    <script src="../js/util/util.saving.js"></script>
+    <script src="../js/renderer/util/util.js"></script>
+    <script src="../js/renderer/util/util.saving.js"></script>
 
-    <script src="../js/app/app.js"></script>
+    <script src="../js/renderer/app/app.js"></script>
 
-    <script src="../js/app/landing/landing.js"></script>
-    <script src="../js/app/landing/landing.model.js"></script>
-    <script src="../js/app/landing/landing.controller.js"></script>
-    <script src="../js/app/landing/landing.view.js"></script>
+    <script src="../js/renderer/app/landing/landing.js"></script>
+    <script src="../js/renderer/app/landing/landing.model.js"></script>
+    <script src="../js/renderer/app/landing/landing.controller.js"></script>
+    <script src="../js/renderer/app/landing/landing.view.js"></script>
 
-    <script src="../js/app/scheduler/scheduler.js"></script>
-    <script src="../js/app/scheduler/scheduler.model.js"></script>
-    <script src="../js/app/scheduler/scheduler.controller.js"></script>
-    <script src="../js/app/scheduler/scheduler.view.js"></script>
+    <script src="../js/renderer/app/scheduler/scheduler.js"></script>
+    <script src="../js/renderer/app/scheduler/scheduler.model.js"></script>
+    <script src="../js/renderer/app/scheduler/scheduler.controller.js"></script>
+    <script src="../js/renderer/app/scheduler/scheduler.view.js"></script>
 
-    <script src="../js/app/placement/placement.js"></script>
-    <script src="../js/app/placement/placement.model.js"></script>
-    <script src="../js/app/placement/placement.controller.js"></script>
-    <script src="../js/app/placement/placement.view.js"></script>
+    <script src="../js/renderer/app/placement/placement.js"></script>
+    <script src="../js/renderer/app/placement/placement.model.js"></script>
+    <script src="../js/renderer/app/placement/placement.controller.js"></script>
+    <script src="../js/renderer/app/placement/placement.view.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
@@ -42,10 +42,6 @@
       $(document).ready(function(){
         let $content_div = $('#content_div');
         app.init_module($content_div, ipcRenderer);
-      });
-
-      ipcRenderer.on('placement.loadScoresFromFile', function(e, filepath) {
-        placement.controller.handle_load_scores_from_file(filepath);
       });
 
       ipcRenderer.on('placement.loadScoresFromSheets', function(e, sheetUrl) {

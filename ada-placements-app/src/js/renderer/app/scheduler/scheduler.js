@@ -1,7 +1,7 @@
 const scheduler = (function () {
 
     const init_module = function ($container, ipcRenderer) {
-        scheduler.constants = require('../js/app/scheduler/constants');
+        scheduler.constants = require('../js/renderer/app/scheduler/constants');
         scheduler.model.init_module();
         scheduler.view.init_module($container);
 

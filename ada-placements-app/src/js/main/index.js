@@ -2,8 +2,8 @@ const { app, BrowserWindow, Menu } = require('electron');
 const contextMenu = require('electron-context-menu');
 const path = require('path');
 
-const placement_index = require('./app/placement/index');
-const scheduler_index = require('./app/scheduler/index');
+const placement_main = require('./placement');
+const scheduler_main = require('./scheduler');
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -19,7 +19,7 @@ contextMenu({
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-ada_modules = [placement_index, scheduler_index];
+ada_modules = [placement_main, scheduler_main];
 
 const createWindow = () => {
   // Create the browser window.
@@ -38,7 +38,7 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(true);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(path.dirname(__dirname), 'html', 'index.html'));
+  mainWindow.loadFile(path.join(path.dirname(__dirname), '..', 'html', 'index.html'));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

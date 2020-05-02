@@ -1,6 +1,3 @@
-const electron_view = require('electron');
-
-
 placement.view = (function () {
     let $container;
 
@@ -15,6 +12,15 @@ placement.view = (function () {
             let title_h1 = document.createElement('h1');
             title_h1.appendChild(document.createTextNode('Internship Placements'));
             placement_div.appendChild(title_h1);
+
+            // Load from file
+            let load_file_button = document.createElement('button');
+            placement_div.appendChild(load_file_button);
+
+            load_file_button.appendChild(document.createTextNode('Load Scores from File'));
+            $(load_file_button).click(function() {
+                placement.controller.handle_load_file();
+            });
 
             return placement_div;
         };

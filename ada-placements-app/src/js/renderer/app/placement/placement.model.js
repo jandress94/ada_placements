@@ -28,7 +28,7 @@ placement.model = (function () {
         return solved_model;
     };
 
-    const _load_scores_from_array = function(data_array) {
+    const load_scores_from_array = function(data_array) {
         solved_model = null;
         scores = [];
         id_to_score = {};
@@ -242,6 +242,7 @@ placement.model = (function () {
     return {
         init_module: init_module,
         get_scores: get_scores,
+        load_scores_from_array: load_scores_from_array,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
         load_scores_from_file: load_scores_from_file,
