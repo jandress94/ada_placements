@@ -8,6 +8,18 @@ placement.view = (function () {
         $container = $c;
     };
 
+    const get_landing_generator_fn = function () {
+        return function () {
+            let placement_div = document.createElement('div');
+
+            let title_h1 = document.createElement('h1');
+            title_h1.appendChild(document.createTextNode('Internship Placements'));
+            placement_div.appendChild(title_h1);
+
+            return placement_div;
+        };
+    };
+
     const clear_container = function() {
         $container.empty();
     };
@@ -176,6 +188,7 @@ placement.view = (function () {
 
     return {
         init_module: init_module,
+        get_landing_generator_fn: get_landing_generator_fn,
         display_scores_page: display_scores_page,
         display_placements_page: display_placements_page,
         display_raw: display_raw

@@ -16,15 +16,22 @@
     <script src="../js/util/util.js"></script>
     <script src="../js/util/util.saving.js"></script>
 
-    <script src="../js/placement/placement.js"></script>
-    <script src="../js/placement/placement.model.js"></script>
-    <script src="../js/placement/placement.controller.js"></script>
-    <script src="../js/placement/placement.view.js"></script>
+    <script src="../js/app/app.js"></script>
 
-    <script src="../js/scheduler/scheduler.js"></script>
-    <script src="../js/scheduler/scheduler.model.js"></script>
-    <script src="../js/scheduler/scheduler.controller.js"></script>
-    <script src="../js/scheduler/scheduler.view.js"></script>
+    <script src="../js/app/landing/landing.js"></script>
+    <script src="../js/app/landing/landing.model.js"></script>
+    <script src="../js/app/landing/landing.controller.js"></script>
+    <script src="../js/app/landing/landing.view.js"></script>
+
+    <script src="../js/app/scheduler/scheduler.js"></script>
+    <script src="../js/app/scheduler/scheduler.model.js"></script>
+    <script src="../js/app/scheduler/scheduler.controller.js"></script>
+    <script src="../js/app/scheduler/scheduler.view.js"></script>
+
+    <script src="../js/app/placement/placement.js"></script>
+    <script src="../js/app/placement/placement.model.js"></script>
+    <script src="../js/app/placement/placement.controller.js"></script>
+    <script src="../js/app/placement/placement.view.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
@@ -34,8 +41,7 @@
 
       $(document).ready(function(){
         let $content_div = $('#content_div');
-        placement.init_module($content_div);
-        scheduler.init_module($content_div);
+        app.init_module($content_div);
       });
 
       ipcRenderer.on('placement.loadScoresFromFile', function(e, filepath) {

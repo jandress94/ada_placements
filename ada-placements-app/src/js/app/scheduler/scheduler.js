@@ -1,0 +1,17 @@
+const scheduler = (function () {
+
+    const init_module = function ($container) {
+        scheduler.constants = require('../js/app/scheduler/constants');
+        scheduler.model.init_module();
+        scheduler.view.init_module($container);
+    };
+
+    const get_landing_generator_fn = function () {
+        return scheduler.controller.get_landing_generator_fn();
+    };
+
+    return {
+        init_module: init_module,
+        get_landing_generator_fn: get_landing_generator_fn
+    };
+}());

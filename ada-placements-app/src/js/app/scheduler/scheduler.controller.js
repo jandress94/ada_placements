@@ -1,4 +1,8 @@
 scheduler.controller = (function () {
+    const get_landing_generator_fn = function () {
+        return scheduler.view.get_landing_generator_fn();
+    };
+
     const handle_load_config_json = function (configUrl) {
         scheduler.model.load_config_json(configUrl)
             .then(() => display_config_page());
@@ -51,6 +55,7 @@ scheduler.controller = (function () {
     };
 
     return {
+        get_landing_generator_fn: get_landing_generator_fn,
         handle_load_config_json: handle_load_config_json,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_setting_change: handle_setting_change,

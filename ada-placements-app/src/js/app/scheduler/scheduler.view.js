@@ -5,6 +5,18 @@ scheduler.view = (function () {
         $container = $c;
     };
 
+    const get_landing_generator_fn = function () {
+        return function () {
+            let scheduler_div = document.createElement('div');
+
+            let title_h1 = document.createElement('h1');
+            title_h1.appendChild(document.createTextNode('Interview Scheduler'));
+            scheduler_div.appendChild(title_h1);
+
+            return scheduler_div;
+        };
+    };
+
     const clear_container = function() {
         $container.empty();
     };
@@ -322,6 +334,7 @@ scheduler.view = (function () {
 
     return {
         init_module: init_module,
+        get_landing_generator_fn: get_landing_generator_fn,
         clear_container: clear_container,
         display_configs: display_configs,
         display_schedule: display_schedule,

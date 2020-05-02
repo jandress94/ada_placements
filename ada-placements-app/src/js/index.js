@@ -2,8 +2,8 @@ const { app, BrowserWindow, Menu } = require('electron');
 const contextMenu = require('electron-context-menu');
 const path = require('path');
 
-const placement_index = require('./placement/index');
-const scheduler_index = require('./scheduler/index');
+const placement_index = require('./app/placement/index');
+const scheduler_index = require('./app/scheduler/index');
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.

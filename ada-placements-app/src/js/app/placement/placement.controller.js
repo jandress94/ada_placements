@@ -1,4 +1,8 @@
 placement.controller = (function () {
+    const get_landing_generator_fn = function () {
+        return placement.view.get_landing_generator_fn();
+    };
+
     const handle_load_scores_from_file = function (filepath) {
         console.log('before');
         placement.model.load_scores_from_file(filepath)
@@ -45,6 +49,7 @@ placement.controller = (function () {
     };
 
     return {
+        get_landing_generator_fn: get_landing_generator_fn,
         handle_load_scores_from_file: handle_load_scores_from_file,
         handle_load_scores_from_sheets: handle_load_scores_from_sheets,
         handle_overwrite_changed: handle_overwrite_changed,
