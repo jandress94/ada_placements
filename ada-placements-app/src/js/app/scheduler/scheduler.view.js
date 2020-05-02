@@ -13,6 +13,15 @@ scheduler.view = (function () {
             title_h1.appendChild(document.createTextNode('Interview Scheduler'));
             scheduler_div.appendChild(title_h1);
 
+            // Load from file
+            let load_file_button = document.createElement('button');
+            scheduler_div.appendChild(load_file_button);
+
+            load_file_button.appendChild(document.createTextNode('Load Config JSON'));
+            $(load_file_button).click(function() {
+                scheduler.controller.handle_load_file();
+            });
+
             return scheduler_div;
         };
     };

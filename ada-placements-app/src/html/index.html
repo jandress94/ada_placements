@@ -41,7 +41,7 @@
 
       $(document).ready(function(){
         let $content_div = $('#content_div');
-        app.init_module($content_div);
+        app.init_module($content_div, ipcRenderer);
       });
 
       ipcRenderer.on('placement.loadScoresFromFile', function(e, filepath) {
@@ -50,10 +50,6 @@
 
       ipcRenderer.on('placement.loadScoresFromSheets', function(e, sheetUrl) {
         placement.controller.handle_load_scores_from_sheets(sheetUrl);
-      });
-
-      ipcRenderer.on('scheduler.loadConfigJSON', function(e, configUrl) {
-        scheduler.controller.handle_load_config_json(configUrl);
       });
     </script>
   </head>

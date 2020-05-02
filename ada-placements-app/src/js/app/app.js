@@ -1,12 +1,12 @@
 const app = (function () {
 
-    const init_module = function ($container) {
-        landing.init_module($container);
+    const init_module = function ($container, ipcRenderer) {
+        landing.init_module($container, ipcRenderer);
 
-        scheduler.init_module($container);
+        scheduler.init_module($container, ipcRenderer);
         landing.register_subapp(scheduler);
 
-        placement.init_module($container);
+        placement.init_module($container, ipcRenderer);
         landing.register_subapp(placement);
 
         landing.start();

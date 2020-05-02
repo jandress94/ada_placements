@@ -9,6 +9,14 @@ scheduler.model = (function () {
         _var_name_to_data_map = null;
     };
 
+    const set_config = function (c) {
+        return new Promise((resolve, reject) => {
+            config = c;
+            _add_default_settings();
+            return resolve();
+        })
+    };
+
     const get_solved_model = function () {
         return new Promise((resolve, reject) => {
             if (solved_model == null) {
@@ -526,6 +534,7 @@ scheduler.model = (function () {
 
     return {
         init_module: init_module,
+        set_config: set_config,
         load_config_json: load_config_json,
         get_config: get_config,
         update_setting: update_setting,

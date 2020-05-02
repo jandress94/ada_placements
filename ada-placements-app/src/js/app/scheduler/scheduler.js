@@ -1,9 +1,13 @@
 const scheduler = (function () {
 
-    const init_module = function ($container) {
+    const init_module = function ($container, ipcRenderer) {
         scheduler.constants = require('../js/app/scheduler/constants');
         scheduler.model.init_module();
         scheduler.view.init_module($container);
+
+        ipcRenderer.on('scheduler.loadConfigJSON', function(e) {
+            scheduler.controller.handle_load_file();
+        });
     };
 
     const get_landing_generator_fn = function () {

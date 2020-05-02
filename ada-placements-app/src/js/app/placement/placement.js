@@ -1,6 +1,6 @@
 const placement = (function () {
 
-    const init_module = function ($container) {
+    const init_module = function ($container, ipcRenderer) {
         placement.constants = require('../js/app/placement/constants');
         placement.model.init_module();
         placement.view.init_module($container);

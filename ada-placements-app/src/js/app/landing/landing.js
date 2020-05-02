@@ -1,6 +1,6 @@
 const landing = (function () {
 
-    const init_module = function ($container) {
+    const init_module = function ($container, ipcRenderer) {
         landing.model.init_module();
         landing.view.init_module($container);
     };

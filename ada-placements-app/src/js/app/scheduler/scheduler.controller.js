@@ -3,6 +3,21 @@ scheduler.controller = (function () {
         return scheduler.view.get_landing_generator_fn();
     };
 
+    const handle_load_file = function () {
+        dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [{ name: 'JSON', extensions: ['json'] }]
+        })
+            .then(result => {
+                if (!result.canceled) {
+                    return fs.readFile(result.filePaths[0], 'utf8')
+                            .then(JSON.parse)
+                            .then(scheduler.model.set_config)
+                            .then(display_config_page);
+                }
+            });
+    };
+
     const handle_load_config_json = function (configUrl) {
         scheduler.model.load_config_json(configUrl)
             .then(() => display_config_page());
@@ -56,6 +71,7 @@ scheduler.controller = (function () {
 
     return {
         get_landing_generator_fn: get_landing_generator_fn,
+        handle_load_file: handle_load_file,
         handle_load_config_json: handle_load_config_json,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_setting_change: handle_setting_change,
