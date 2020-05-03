@@ -1,6 +1,8 @@
 const app = (function () {
 
     const init_module = function ($container, ipcRenderer) {
+        util.init_module($container);
+
         landing.init_module($container, ipcRenderer);
 
         scheduler.init_module($container, ipcRenderer);

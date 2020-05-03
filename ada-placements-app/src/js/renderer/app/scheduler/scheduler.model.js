@@ -528,7 +528,7 @@ scheduler.model = (function () {
             }
             resolve(solved_model.schedule);
         }).then(
-            schedule_data => util.saving.save_to_csv(() => _save_schedule_to_array(schedule_data))
+            schedule_data => util.io.save_to_csv(() => _save_schedule_to_array(schedule_data))
         );
     };
 

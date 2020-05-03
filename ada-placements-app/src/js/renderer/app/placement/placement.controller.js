@@ -23,18 +23,17 @@ placement.controller = (function () {
             });
     };
 
-    const handle_load_scores_from_file = function (filepath) {
-        console.log('before');
-        placement.model.load_scores_from_file(filepath)
-            .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+    const handle_load_sheet = function () {
+        util.io.get_google_sheet_id()
+            .then(result => {
+                if (!result.canceled) {
+                    return util.io.load_google_sheet_data(result.sheet_id, 'A:E')
+                        .then(placement.model.load_scores_from_array)
+                        .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+                        .catch(alert);
+                }
+            })
             .catch(alert);
-        console.log('after');
-    };
-
-    const handle_load_scores_from_sheets = function (sheetUrl) {
-        placement.model.load_scores_from_sheets(sheetUrl).then(function(){
-            placement.view.display_scores_page(placement.model.get_scores());
-        });
     };
 
     const handle_overwrite_changed = function (score_id, new_val) {
@@ -71,8 +70,7 @@ placement.controller = (function () {
     return {
         get_landing_generator_fn: get_landing_generator_fn,
         handle_load_file: handle_load_file,
-        handle_load_scores_from_file: handle_load_scores_from_file,
-        handle_load_scores_from_sheets: handle_load_scores_from_sheets,
+        handle_load_sheet: handle_load_sheet,
         handle_overwrite_changed: handle_overwrite_changed,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,

@@ -22,6 +22,15 @@ placement.view = (function () {
                 placement.controller.handle_load_file();
             });
 
+            // Load from sheet
+            let load_sheet_button = document.createElement('button');
+            placement_div.appendChild(load_sheet_button);
+
+            load_sheet_button.appendChild(document.createTextNode('Load Scores from Google Sheet'));
+            $(load_sheet_button).click(function() {
+                placement.controller.handle_load_sheet();
+            });
+
             return placement_div;
         };
     };

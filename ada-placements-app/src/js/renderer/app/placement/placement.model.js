@@ -2,19 +2,11 @@ placement.model = (function () {
     let scores;
     let id_to_score;
     let solved_model;
-    let oAuth2Client;
 
     const init_module = function () {
         scores = null;
         id_to_score = null;
         solved_model = null;
-
-        fs.readFile(placement.constants.GOOGLE_CREDENTIALS_PATH)
-            .then(credentials => {
-                const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
-                oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-            })
-            .catch(err => console.log('Error loading client secret file: ' + err));
     };
 
     const get_scores = function () {
@@ -61,47 +53,6 @@ placement.model = (function () {
 
             scores.push(score_entry);
         }
-    };
-    
-    const load_scores_from_file = function (filepath) {
-        return fs.readFile(filepath)
-            .then(data_csv_raw =>
-                parse(data_csv_raw.toString(), {
-                   cast: true,
-                   columns: false,
-                   skip_empty_lines: true
-                })
-            )
-            .then(data_csv_parsed => _load_scores_from_array(data_csv_parsed))
-    };
-
-    const _sheet_url_to_sheet_id = function (sheetUrl) {
-        if (sheetUrl.match(/^[a-zA-Z0-9-_]+$/g) != null) {
-            return sheetUrl;
-        } else {
-            let matches = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-            if (matches.length > 0) {
-                return matches[1];
-            } else {
-                return null;
-            }
-        }
-    };
-
-    const load_scores_from_sheets = function (sheetUrl) {
-        let token = fs.readFileSync(placement.constants.TOKEN_PATH);
-
-        oAuth2Client.setCredentials(JSON.parse(token));
-
-        const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
-        return sheets.spreadsheets.values.get({
-            spreadsheetId: _sheet_url_to_sheet_id(sheetUrl),
-            range: 'A:E',
-        }).then(res => {
-            _load_scores_from_array(res.data.values);
-        }).catch(err => {
-            console.error('The API returned an error: ' + err)
-        });
     };
 
     const update_overwrite = function (score_id, new_val) {
@@ -189,44 +140,44 @@ placement.model = (function () {
         return values;
     };
 
-    // Todo: investigate failing save
-    const save_placements_to_sheets = function() {
-        if (solved_model === null) {
-            return new Promise(((resolve, reject) => {
-                return reject("Cannot save because the placements have not been recomputed.");
-            }));
-        }
-
-        const resource_create = {
-            properties: {
-                title: 'Placements'
-            }
-        };
-        const resource_update = {
-            values: _save_placements_to_array(solved_model.placements)
-        };
-
-        const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
-        return new Promise((resolve, reject) => {
-            sheets.spreadsheets.create({
-                resource: resource_create,
-                fields: 'spreadsheetId'
-            }).then(function(spreadsheet) {
-                sheets.spreadsheets.values.update({
-                    spreadsheetId: spreadsheet.data.spreadsheetId,
-                    range: 'A:E',
-                    valueInputOption: 'RAW',
-                    resource: resource_update
-                }).then(function (result) {
-                    return resolve('Placements saved with spreadsheetId ' + spreadsheet.data.spreadsheetId);
-                }).catch(function (err) {
-                    return reject("Error saving placements to new spreadsheet: " + err);
-                })
-            }).catch(function(err) {
-                return reject("Error creating new spreadsheet for placements: " + err);
-            })
-        });
-    };
+    // // Todo: investigate failing save
+    // const save_placements_to_sheets = function() {
+    //     if (solved_model === null) {
+    //         return new Promise(((resolve, reject) => {
+    //             return reject("Cannot save because the placements have not been recomputed.");
+    //         }));
+    //     }
+    //
+    //     const resource_create = {
+    //         properties: {
+    //             title: 'Placements'
+    //         }
+    //     };
+    //     const resource_update = {
+    //         values: _save_placements_to_array(solved_model.placements)
+    //     };
+    //
+    //     const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
+    //     return new Promise((resolve, reject) => {
+    //         sheets.spreadsheets.create({
+    //             resource: resource_create,
+    //             fields: 'spreadsheetId'
+    //         }).then(function(spreadsheet) {
+    //             sheets.spreadsheets.values.update({
+    //                 spreadsheetId: spreadsheet.data.spreadsheetId,
+    //                 range: 'A:E',
+    //                 valueInputOption: 'RAW',
+    //                 resource: resource_update
+    //             }).then(function (result) {
+    //                 return resolve('Placements saved with spreadsheetId ' + spreadsheet.data.spreadsheetId);
+    //             }).catch(function (err) {
+    //                 return reject("Error io placements to new spreadsheet: " + err);
+    //             })
+    //         }).catch(function(err) {
+    //             return reject("Error creating new spreadsheet for placements: " + err);
+    //         })
+    //     });
+    // };
 
     const save_placements_to_csv = function() {
         return new Promise((resolve, reject) => {
@@ -235,7 +186,7 @@ placement.model = (function () {
             }
             resolve(solved_model.placements);
         }).then(
-            placements_data => util.saving.save_to_csv(() => _save_placements_to_array(placements_data))
+            placements_data => util.io.save_to_csv(() => _save_placements_to_array(placements_data))
         );
     };
 
@@ -245,9 +196,6 @@ placement.model = (function () {
         load_scores_from_array: load_scores_from_array,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
-        load_scores_from_file: load_scores_from_file,
-        load_scores_from_sheets: load_scores_from_sheets,
-        save_placements_to_sheets: save_placements_to_sheets,
         save_placements_to_csv: save_placements_to_csv
     };
 }());

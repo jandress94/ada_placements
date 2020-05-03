@@ -8,6 +8,10 @@ const placement = (function () {
         ipcRenderer.on('placement.loadScoresFile', function(e) {
             placement.controller.handle_load_file();
         });
+
+        ipcRenderer.on('placement.loadScoresSheet', function (e) {
+            placement.controller.handle_load_sheet();
+        })
     };
 
     const get_landing_generator_fn = function () {

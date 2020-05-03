@@ -4,3 +4,6 @@ const solver = require("javascript-lp-solver/src/solver");
 const parse = require('csv-parse/lib/sync');
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const {google} = require('googleapis');
+const path = require('path');
+const electron = require('electron');
+const {ipcRenderer, clipboard} = electron;

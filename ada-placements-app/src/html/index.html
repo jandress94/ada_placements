@@ -14,7 +14,8 @@
     <script src="../js/renderer/renderer_imports.js"></script>
 
     <script src="../js/renderer/util/util.js"></script>
-    <script src="../js/renderer/util/util.saving.js"></script>
+    <script src="../js/renderer/util/io/util.io.js"></script>
+    <script src="../js/renderer/util/io/util.io.view.js"></script>
 
     <script src="../js/renderer/app/app.js"></script>
 
@@ -36,16 +37,9 @@
     <script>if (window.module) module = window.module;</script>
 
     <script type="text/javascript">
-      const electron = require('electron');
-      const {ipcRenderer} = electron;
-
       $(document).ready(function(){
         let $content_div = $('#content_div');
         app.init_module($content_div, ipcRenderer);
-      });
-
-      ipcRenderer.on('placement.loadScoresFromSheets', function(e, sheetUrl) {
-        placement.controller.handle_load_scores_from_sheets(sheetUrl);
       });
     </script>
   </head>
