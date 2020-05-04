@@ -30,10 +30,18 @@ placement.controller = (function () {
                     return util.io.load_google_sheet_data(result.sheet_id, 'A:E')
                         .then(placement.model.load_scores_from_array)
                         .then(() => placement.view.display_scores_page(placement.model.get_scores()))
-                        .catch(alert);
+                        .catch(err => {
+                            alert(err);
+                            landing.start();
+                        });
+                } else {
+                    landing.start();
                 }
             })
-            .catch(alert);
+            .catch(err => {
+                alert(err);
+                landing.start();
+            });
     };
 
     const handle_overwrite_changed = function (score_id, new_val) {

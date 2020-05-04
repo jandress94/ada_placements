@@ -65,14 +65,15 @@ util.io = (function () {
                 .then(auth_code => {
                     return oAuth.getToken(auth_code, (err, token) => {
                         if (err) {
-                            return reject(err);
+                            return reject('Problem retrieving token: ' + err);
                         }
 
                         return fs.writeFile(util.io.constants.TOKEN_PATH, JSON.stringify(token))
                             .then(resolve)
-                            .catch(err => reject(err));
+                            .catch(err => reject('Problem saving token: ' + err));
                     });
-                });
+                })
+                .catch(err => reject('Problem getting authentication code: ' + err));
         });
     };
 
