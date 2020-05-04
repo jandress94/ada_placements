@@ -63,7 +63,7 @@ placement.controller = (function () {
             .catch(alert);
     };
 
-    const handle_save_csv_button_clicked = function () {
+    const handle_save_to_csv = function () {
         placement.model.save_placements_to_csv()
             .then(save_state => {
                 if (save_state.state === 'success') {
@@ -81,6 +81,6 @@ placement.controller = (function () {
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,
         handle_save_to_sheet: handle_save_to_sheet,
-        handle_save_csv_button_clicked: handle_save_csv_button_clicked
+        handle_save_to_csv: handle_save_to_csv
     };
 }());

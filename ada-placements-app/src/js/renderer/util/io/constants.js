@@ -1,7 +1,5 @@
 const APP_LOCALSTORAGE = path.join((electron.app || electron.remote.app).getPath('userData'), 'Local Storage');
 
-console.log('local storage: ' + APP_LOCALSTORAGE);
-
 const TOKEN_DIR = path.join(APP_LOCALSTORAGE, 'tokens');
 fs.access(TOKEN_DIR).catch(() => fs.mkdir(TOKEN_DIR));
 

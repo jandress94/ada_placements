@@ -195,7 +195,7 @@ placement.view = (function () {
 
         save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
         $(save_csv_button).click(function() {
-            placement.controller.handle_save_csv_button_clicked();
+            placement.controller.handle_save_to_csv();
         });
 
         placements_div.appendChild(_create_table_for_scores(solved_model.placements));

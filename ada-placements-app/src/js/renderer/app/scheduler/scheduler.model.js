@@ -476,14 +476,6 @@ scheduler.model = (function () {
             scheduler.constants.DEFAULT_IS_MUTUAL_PREF_SCORE);
     };
 
-    const load_config_json = function (configUrl) {
-        return fs.readFile(configUrl, 'utf8')
-            .then(configStr => {
-                config = JSON.parse(configStr);
-                _add_default_settings();
-            });
-    };
-
     const update_setting = function (setting_key, new_val) {
         solved_model = null;
         _var_name_to_data_map = null;
@@ -517,16 +509,21 @@ scheduler.model = (function () {
 
     const save_schedule_to_sheets = function () {
         return new Promise((resolve, reject) => {
-            return reject("Not Implemented");
-        });
+            if (solved_model === null) {
+                return reject('Cannot save because the schedule has not been recomputed.');
+            }
+            return resolve(solved_model.schedule);
+        }).then(
+            schedule_data => util.io.save_to_sheet('Interview Schedule', () => _save_schedule_to_array(schedule_data))
+        );
     };
 
     const save_schedule_to_csv = function () {
         return new Promise((resolve, reject) => {
             if (solved_model === null) {
-                reject("Cannot save because the schedule has not been recomputed.");
+                return reject("Cannot save because the schedule has not been recomputed.");
             }
-            resolve(solved_model.schedule);
+            return resolve(solved_model.schedule);
         }).then(
             schedule_data => util.io.save_to_csv(() => _save_schedule_to_array(schedule_data))
         );
@@ -535,7 +532,6 @@ scheduler.model = (function () {
     return {
         init_module: init_module,
         set_config: set_config,
-        load_config_json: load_config_json,
         get_config: get_config,
         update_setting: update_setting,
         get_solved_model: get_solved_model,

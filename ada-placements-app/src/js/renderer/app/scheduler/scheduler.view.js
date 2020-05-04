@@ -290,7 +290,7 @@ scheduler.view = (function () {
 
         save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
         $(save_sheets_button).click(function() {
-            scheduler.controller.handle_save_sheets_button_clicked();
+            scheduler.controller.handle_save_to_sheet();
         });
 
         let save_csv_button = document.createElement('button');
@@ -298,7 +298,7 @@ scheduler.view = (function () {
 
         save_csv_button.appendChild(document.createTextNode('Save to CSV File'));
         $(save_csv_button).click(function() {
-            scheduler.controller.handle_save_csv_button_clicked();
+            scheduler.controller.handle_save_to_csv();
         });
 
         h1.appendChild(document.createTextNode('Created Schedule with Score ' + solved_model.score));

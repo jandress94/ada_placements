@@ -47,15 +47,13 @@ scheduler.controller = (function () {
         scheduler.model.update_overwrite(student_name, team_name, new_val);
     };
 
-    const handle_save_sheets_button_clicked = function () {
-        scheduler.model.save_schedule_to_sheets().then(function(successMsg) {
-            alert(successMsg);
-        }).catch(function(err) {
-            alert(err);
-        });
+    const handle_save_to_sheet = function () {
+        scheduler.model.save_schedule_to_sheets()
+            .then(spreadsheetId => alert('Saved interview schedule to spreadsheet ' + spreadsheetId))
+            .catch(alert);
     };
 
-    const handle_save_csv_button_clicked = function () {
+    const handle_save_to_csv = function () {
         scheduler.model.save_schedule_to_csv()
             .then(save_state => {
                 if (save_state.state === 'success') {
@@ -73,7 +71,7 @@ scheduler.controller = (function () {
         handle_back_to_configs_button_clicked: handle_back_to_configs_button_clicked,
         handle_overwrite_changed: handle_overwrite_changed,
         display_config_page: display_config_page,
-        handle_save_sheets_button_clicked: handle_save_sheets_button_clicked,
-        handle_save_csv_button_clicked: handle_save_csv_button_clicked
+        handle_save_to_sheet: handle_save_to_sheet,
+        handle_save_to_csv: handle_save_to_csv
     };
 }());
