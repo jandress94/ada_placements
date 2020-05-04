@@ -187,7 +187,7 @@ placement.view = (function () {
 
         save_sheets_button.appendChild(document.createTextNode('Save to Google Sheets'));
         $(save_sheets_button).click(function() {
-            placement.controller.handle_save_sheets_button_clicked();
+            placement.controller.handle_save_to_sheet();
         });
 
         let save_csv_button = document.createElement('button');

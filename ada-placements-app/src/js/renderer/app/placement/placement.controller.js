@@ -57,12 +57,10 @@ placement.controller = (function () {
         placement.view.display_scores_page(placement.model.get_scores());
     };
 
-    const handle_save_placements_button_clicked = function () {
-        placement.model.save_placements_to_sheets().then(function(successMsg) {
-            alert(successMsg);
-        }).catch(function(err) {
-            alert(err);
-        });
+    const handle_save_to_sheet = function () {
+        placement.model.save_placements_to_sheet()
+            .then(spreadsheetid => alert('Saved placements to spreadsheet ' + spreadsheetid))
+            .catch(alert);
     };
 
     const handle_save_csv_button_clicked = function () {
@@ -82,7 +80,7 @@ placement.controller = (function () {
         handle_overwrite_changed: handle_overwrite_changed,
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,
-        handle_save_sheets_button_clicked: handle_save_placements_button_clicked,
+        handle_save_to_sheet: handle_save_to_sheet,
         handle_save_csv_button_clicked: handle_save_csv_button_clicked
     };
 }());

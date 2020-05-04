@@ -92,20 +92,24 @@ util.io = (function () {
         });
     };
 
-    const load_google_sheet_data = function (sheet_id, range) {
+    const get_google_sheets = function() {
         return get_google_oAuth()
             .then(oAuthClient => {
                 return get_google_token(oAuthClient)
                     .then(token => {
                         oAuthClient.setCredentials(token);
                         return google.sheets({version: 'v4', auth: oAuthClient});
-                    })
-                    .then(sheets => sheets.spreadsheets.values.get({
-                        spreadsheetId: sheet_id,
-                        range: range
-                    }))
-                    .then(res => res.data.values);
+                    });
             });
+    };
+
+    const load_google_sheet_data = function (sheet_id, range) {
+        return get_google_sheets()
+            .then(sheets => sheets.spreadsheets.values.get({
+                spreadsheetId: sheet_id,
+                range: range
+            }))
+            .then(res => res.data.values);
     };
 
     const save_to_file = function(filePath, data_fn) {
@@ -127,10 +131,44 @@ util.io = (function () {
         });
     };
 
+    const save_to_sheet = function (sheet_title, data_array_fn) {
+        const resource_create = {
+            properties: {
+                title: sheet_title
+            }
+        };
+
+        return get_google_sheets()
+            .then(sheets => {
+                return sheets.spreadsheets.create({
+                    resource: resource_create,
+                    fields: 'spreadsheetId'
+                })
+                    .then(new_spreadsheet => {
+                        let data_array = data_array_fn();
+                        let num_cols = data_array[0].length;
+                        let range = 'A:' + String.fromCharCode('A'.charCodeAt(0) + (num_cols - 1));
+
+                        return sheets.spreadsheets.values.update({
+                            spreadsheetId: new_spreadsheet.data.spreadsheetId,
+                            range: range,
+                            valueInputOption: 'RAW',
+                            resource: {
+                                values: data_array
+                            }
+                        })
+                            .then(result => Promise.resolve(new_spreadsheet.data.spreadsheetId))
+                            .catch(err => Promise.reject('Error saving to spreadsheet ' + new_spreadsheet.data.spreadsheetId + ": " + err));
+                    })
+                    .catch(err => Promise.reject('Error creating new spreadsheet: ' + err));
+            });
+    };
+
     return {
         init_module: init_module,
         get_google_sheet_id: get_google_sheet_id,
         load_google_sheet_data: load_google_sheet_data,
-        save_to_csv: save_to_csv
-    }
+        save_to_csv: save_to_csv,
+        save_to_sheet: save_to_sheet
+    };
 }());

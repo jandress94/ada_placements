@@ -140,53 +140,25 @@ placement.model = (function () {
         return values;
     };
 
-    // // Todo: investigate failing save
-    // const save_placements_to_sheets = function() {
-    //     if (solved_model === null) {
-    //         return new Promise(((resolve, reject) => {
-    //             return reject("Cannot save because the placements have not been recomputed.");
-    //         }));
-    //     }
-    //
-    //     const resource_create = {
-    //         properties: {
-    //             title: 'Placements'
-    //         }
-    //     };
-    //     const resource_update = {
-    //         values: _save_placements_to_array(solved_model.placements)
-    //     };
-    //
-    //     const sheets = google.sheets({version: 'v4', auth: oAuth2Client});
-    //     return new Promise((resolve, reject) => {
-    //         sheets.spreadsheets.create({
-    //             resource: resource_create,
-    //             fields: 'spreadsheetId'
-    //         }).then(function(spreadsheet) {
-    //             sheets.spreadsheets.values.update({
-    //                 spreadsheetId: spreadsheet.data.spreadsheetId,
-    //                 range: 'A:E',
-    //                 valueInputOption: 'RAW',
-    //                 resource: resource_update
-    //             }).then(function (result) {
-    //                 return resolve('Placements saved with spreadsheetId ' + spreadsheet.data.spreadsheetId);
-    //             }).catch(function (err) {
-    //                 return reject("Error io placements to new spreadsheet: " + err);
-    //             })
-    //         }).catch(function(err) {
-    //             return reject("Error creating new spreadsheet for placements: " + err);
-    //         })
-    //     });
-    // };
-
     const save_placements_to_csv = function() {
         return new Promise((resolve, reject) => {
             if (solved_model === null) {
-                reject("Cannot save because the placements have not been recomputed.");
+                return reject("Cannot save because the placements have not been recomputed.");
             }
-            resolve(solved_model.placements);
+            return resolve(solved_model.placements);
         }).then(
             placements_data => util.io.save_to_csv(() => _save_placements_to_array(placements_data))
+        );
+    };
+
+    const save_placements_to_sheet = function () {
+        return new Promise((resolve, reject) => {
+            if (solved_model === null) {
+                return reject("cannot save because the placements have not been recomputed.");
+            }
+            return resolve(solved_model.placements);
+        }).then(
+            placements_data => util.io.save_to_sheet('Placements', () => _save_placements_to_array(placements_data))
         );
     };
 
@@ -196,6 +168,7 @@ placement.model = (function () {
         load_scores_from_array: load_scores_from_array,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
-        save_placements_to_csv: save_placements_to_csv
+        save_placements_to_csv: save_placements_to_csv,
+        save_placements_to_sheet: save_placements_to_sheet
     };
 }());
