@@ -80,10 +80,20 @@ app.on('activate', () => {
   }
 });
 
+const _view_landing = function () {
+    mainWindow.webContents.send('landing.view');
+};
+
 const mainMenuTemplate = [
   {
     label: app.name,
     submenu: [
+      {
+          label: 'View Landing Page',
+          click() {
+              _view_landing();
+          }
+      },
       {role: 'about'},
       {role: 'quit'}
     ]

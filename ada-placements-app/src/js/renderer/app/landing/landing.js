@@ -3,6 +3,10 @@ const landing = (function () {
     const init_module = function ($container, ipcRenderer) {
         landing.model.init_module();
         landing.view.init_module($container);
+
+        ipcRenderer.on('landing.view', function(e) {
+            landing.controller.display_landing();
+        });
     };
 
     const register_subapp = function (subapp) {
