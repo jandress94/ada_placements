@@ -35,7 +35,7 @@ scheduler.model.validation = (function () {
 
             let all_companies = [];
             let all_teams = [];
-            // TODO: validate unique interviewer names?
+            let all_interviewers = [];
             for (let i = 0; i < config.companies.length; i++) {
                 const company = config.companies[i];
                 if (!company.hasOwnProperty("name")) {
@@ -84,6 +84,12 @@ scheduler.model.validation = (function () {
                         if (!interviewer.hasOwnProperty("timeslots")) {
                             return reject('Company index ' + i + ', Team index ' + j +
                                 ', Interviewer index ' + k + ' is missing the "timeslots" field');
+                        }
+
+                        if (all_interviewers.includes(interviewer.name)) {
+                            return reject('Interviewer ' + interviewer.name + ' appears multiple times in the company definitions');
+                        } else {
+                            all_interviewers.push(interviewer.name);
                         }
                     }
                 }
