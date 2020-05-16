@@ -95,6 +95,9 @@ scheduler.model = (function () {
     };
 
     const _create_cnstrt_and_push = function(c_map, c, c_key, v, limits) {
+        if (!c_map.hasOwnProperty(c)) {
+            c_map[c] = {};
+        }
         if (!c_map[c].hasOwnProperty(c_key)) {
             c_map[c][c_key] = {
                 limits: limits,
@@ -114,9 +117,6 @@ scheduler.model = (function () {
         let var_names = [];
         let score_terms = [];
         let constraints_map = {};
-        for (let i = 1; i <= 11; i++) {
-            constraints_map['c' + i] = {};
-        }
 
         for (let idx_student = 0; idx_student < student_configs.length; idx_student++) {
             let student = student_configs[idx_student];
@@ -184,7 +184,7 @@ scheduler.model = (function () {
                             score_terms.push(score + " * " + var_name);
 
                             // make sure each student interviews with at least n teams and at most m teams
-                            _create_cnstrt_and_push(constraints_map, 'c1', s_name, var_name,
+                            _create_cnstrt_and_push(constraints_map, 'constraint_1', s_name, var_name,
                                 {
                                     min: config.settings[scheduler.constants.MIN_INTERVIEW_PER_STUDENT],
                                     max: config.settings[scheduler.constants.MAX_INTERVIEW_PER_STUDENT]
@@ -192,31 +192,31 @@ scheduler.model = (function () {
                             );
 
                             // make sure each interviewer has each slot filled at most once
-                            _create_cnstrt_and_push(constraints_map, 'c2', i_name + "_" + timeslot, var_name, { max: 1 });
+                            _create_cnstrt_and_push(constraints_map, 'constraint_2', i_name + "_" + timeslot, var_name, { max: 1 });
 
                             // make sure each interviewer has at least n interviews
-                            _create_cnstrt_and_push(constraints_map, 'c3', i_name, var_name,
+                            _create_cnstrt_and_push(constraints_map, 'constraint_3', i_name, var_name,
                                 {
                                     min: config.settings[scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER]
                                 }
                             );
 
                             // make sure each student is in each timestot at most once
-                            _create_cnstrt_and_push(constraints_map, 'c4', s_name + "_" + timeslot, var_name, { max: 1 });
+                            _create_cnstrt_and_push(constraints_map, 'constraint_4', s_name + "_" + timeslot, var_name, { max: 1 });
 
                             // make sure each student interviews with each company at most n times
-                            _create_cnstrt_and_push(constraints_map, 'c5', s_name + "_" + c_name, var_name,
+                            _create_cnstrt_and_push(constraints_map, 'constraint_5', s_name + "_" + c_name, var_name,
                                 {
                                         max: config.settings[scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT]
                                 }
                             );
 
                             // make sure each student interviews with each team at most once
-                            _create_cnstrt_and_push(constraints_map, 'c6', s_name + "_" + t_name, var_name, { max: 1 });
+                            _create_cnstrt_and_push(constraints_map, 'constraint_6', s_name + "_" + t_name, var_name, { max: 1 });
 
                             // make sure each student interviews with at least n of their preferences
                             if (is_student_pref) {
-                                _create_cnstrt_and_push(constraints_map, 'c7', s_name, var_name,
+                                _create_cnstrt_and_push(constraints_map, 'constraint_7', s_name, var_name,
                                     {
                                         min: Math.min(
                                             config.settings[scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
@@ -228,7 +228,7 @@ scheduler.model = (function () {
 
                             // make sure each team interviews with at least n of their preferences
                             if (is_team_pref) {
-                                _create_cnstrt_and_push(constraints_map, 'c8', t_name, var_name,
+                                _create_cnstrt_and_push(constraints_map, 'constraint_8', t_name, var_name,
                                     {
                                         min: Math.min(
                                             config.settings[scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
@@ -240,18 +240,18 @@ scheduler.model = (function () {
 
                             // if preferences align, make sure interview occurs
                             if (config.settings[scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref) {
-                                _create_cnstrt_and_push(constraints_map, 'c9', s_name + "_" + t_name, var_name, { min: 1 });
+                                _create_cnstrt_and_push(constraints_map, 'constraint_9', s_name + "_" + t_name, var_name, { min: 1 });
                             }
 
                             // add in overwrites
                             if (over_val !== null){
-                                _create_cnstrt_and_push(constraints_map, 'c10', s_name + "_" + t_name, var_name, { equal: over_val ? 1 : 0 });
+                                _create_cnstrt_and_push(constraints_map, 'constraint_10', s_name + "_" + t_name, var_name, { equal: over_val ? 1 : 0 });
                             }
 
                             // time windows
                             for (let idx_window = 0; idx_window < timeslot_to_window_map[timeslot].length; idx_window++) {
                                 let window = timeslot_to_window_map[timeslot][idx_window];
-                                _create_cnstrt_and_push(constraints_map, 'c11', s_name + "_" + window, var_name,
+                                _create_cnstrt_and_push(constraints_map, 'constraint_11', s_name + "_" + window, var_name,
                                     {
                                         max: config.settings[scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW]
                                     }
@@ -304,13 +304,17 @@ scheduler.model = (function () {
     const _parse_solved_model = function(data) {
         let results = atob($(data.documentElement).find('base64').first().text());
 
-        let status_idx = results.indexOf('PRIMAL_FEASIBLE');
-
-        if (status_idx < 0) {
+        // Check for infeasible
+        if (results.indexOf('PRIMAL_INFEASIBLE') >= 0) {
             solved_model = {
                 is_feasible: false
             };
-            return;
+            return null;
+        }
+
+        // Check for error
+        if (results.indexOf('PRIMAL_FEASIBLE') < 0) {
+            return results;
         }
 
         solved_model = {
@@ -346,6 +350,8 @@ scheduler.model = (function () {
         for (let i = 0; i < assigned_vars.length; i++) {
             solved_model.schedule.push(_var_name_to_data_map[assigned_vars[i]]);
         }
+
+        return null;
     };
 
     const _get_solved_model = function(data) {
@@ -366,7 +372,11 @@ scheduler.model = (function () {
 
             $.post('https://neos-server.org:3333', xml_rpc_results_request)
                 .done(function(data) {
-                    _parse_solved_model(data);
+                    let error = _parse_solved_model(data);
+
+                    if (error !== null) {
+                        return reject('Error getting job results:\n' + error);
+                    }
                     return resolve();
                 })
                 .fail(function(err) {
