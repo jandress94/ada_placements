@@ -356,6 +356,10 @@ scheduler.model = (function () {
 
     const _get_solved_model = function(data) {
         return new Promise((resolve, reject) => {
+            if ($(data.documentElement).find("fault").length > 0) {
+                throw 'Error submitting job: ' + $(data.documentElement).find('string').first().text();
+            }
+
             let $d = $(data.documentElement).find("data");
 
             let job_num = $d.find('int').first().text();
