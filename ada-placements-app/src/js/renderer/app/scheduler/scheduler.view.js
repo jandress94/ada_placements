@@ -127,7 +127,7 @@ scheduler.view = (function () {
         let override_table_body = document.createElement('tbody');
         override_table.appendChild(override_table_body);
 
-        const overrides = config[scheduler.constants.OVERRIDES];
+        const overrides = config.overrides;
         for (let i = 0; i < overrides.length; i++) {
             const over = overrides[i];
 

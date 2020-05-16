@@ -7,201 +7,7 @@ scheduler.model = (function () {
         config = null;
         solved_model = null;
         _var_name_to_data_map = null;
-    };
-
-    const _validate_config = function (resolve, reject) {
-        // ensure timeslots structure is correct
-        if (!config.hasOwnProperty('timeslots')) {
-            return reject('The config is missing the "timeslots" field.');
-        }
-
-        let all_timeslots = [];
-        for (let i = 0; i < config.timeslots.length; i++) {
-            const day = config.timeslots[i];
-            if (!day.hasOwnProperty("day")) {
-                return reject('Timeslot index ' + i + ' is missing the "day" field');
-            }
-            if (!day.hasOwnProperty("times")) {
-                return reject('Timeslot index ' + i + ' is missing the "times" field');
-            }
-            for (let j = 0; j < day.times.length; j++) {
-                const timeslot = day.day + "_" + day.times[j];
-                if (all_timeslots.includes(timeslot)) {
-                    return reject('Timeslot ' + timeslot + ' appears multiple times in the timeslot definitions')
-                } else {
-                    all_timeslots.push(timeslot);
-                }
-            }
-        }
-
-        // ensure companies structure is correct
-        if (!config.hasOwnProperty('companies')) {
-            return reject('The config is missing the "companies" field.');
-        }
-
-        let all_companies = [];
-        let all_teams = [];
-        for (let i = 0; i < config.companies.length; i++) {
-            const company = config.companies[i];
-            if (!company.hasOwnProperty("name")) {
-                return reject('Company index ' + i + ' is missing the "name" field');
-            }
-            if (!company.hasOwnProperty("teams")) {
-                return reject('Company index ' + i + ' is missing the "teams" field');
-            }
-
-            if (all_companies.includes(company.name)) {
-                return reject('Company ' + company.name + ' appears multiple times in the company definitions');
-            } else {
-                all_companies.push(company.name);
-            }
-
-            for (let j = 0; j < company.teams.length; j++) {
-                const team = company.teams[j];
-                if (!team.hasOwnProperty("name")) {
-                    return reject('Company index ' + i + ', Team index ' + j + ' is missing the "name" field');
-                }
-                if (!team.hasOwnProperty("positions")) {
-                    return reject('Company index ' + i + ', Team index ' + j + ' is missing the "positions" field');
-                }
-                if (!team.hasOwnProperty("difficulty")) {
-                    return reject('Company index ' + i + ', Team index ' + j + ' is missing the "difficulty" field');
-                }
-                if (!team.hasOwnProperty("preferences")) {
-                    return reject('Company index ' + i + ', Team index ' + j + ' is missing the "preferences" field');
-                }
-                if (!team.hasOwnProperty("interviewers")) {
-                    return reject('Company index ' + i + ', Team index ' + j + ' is missing the "interviewers" field');
-                }
-
-                if (all_teams.includes(team.name)) {
-                    return reject('Team ' + team.name + ' appears multiple times in the company definitions');
-                } else {
-                    all_teams.push(team.name);
-                }
-
-                for (let k = 0; k < team.interviewers.length; k++) {
-                    const interviewer = team.interviewers[k];
-                    if (!interviewer.hasOwnProperty("name")) {
-                        return reject('Company index ' + i + ', Team index ' + j +
-                            ', Interviewer index ' + k + ' is missing the "name" field');
-                    }
-                    if (!interviewer.hasOwnProperty("timeslots")) {
-                        return reject('Company index ' + i + ', Team index ' + j +
-                            ', Interviewer index ' + k + ' is missing the "timeslots" field');
-                    }
-                }
-            }
-        }
-
-        // ensure students structure is correct
-        if (!config.hasOwnProperty('students')) {
-            return reject('The config is missing the "students" field.');
-        }
-
-        let all_students = [];
-        for (let i = 0; i < config.students.length; i++) {
-            const student = config.students[i];
-            if (!student.hasOwnProperty("name")) {
-                return reject('Student index ' + i + ' is missing the "name" field');
-            }
-            if (!student.hasOwnProperty("difficulty")) {
-                return reject('Student index ' + i + ' is missing the "difficulty" field');
-            }
-            if (!student.hasOwnProperty("preferences")) {
-                return reject('Student index ' + i + ' is missing the "preferences" field');
-            }
-
-            if (all_students.includes(student.name)) {
-                return reject('Student ' + student.name + ' appears multiple times in the student definitions');
-            } else {
-                all_students.push(student.name);
-            }
-        }
-
-        // ensure overrides structure is correct
-        if (!config.hasOwnProperty('overrides')) {
-            return reject('The config is missing the "overrides" field.');
-        }
-
-        let all_overrides = [];
-        for (let i = 0; i < config.overrides.length; i++) {
-            const override = config.overrides[i];
-            if (!override.hasOwnProperty("person")) {
-                return reject('Override index ' + i + ' is missing the "person" field');
-            }
-            if (!override.hasOwnProperty("team")) {
-                return reject('Override index ' + i + ' is missing the "team" field');
-            }
-            if (!override.hasOwnProperty("value")) {
-                return reject('Override index ' + i + ' is missing the "value" field');
-            }
-
-            const override_concat = override.person + "_over_" + override.team;
-            if (all_overrides.includes(override_concat)) {
-                return reject('Override for (' + override.person + ', ' + override.team +
-                    ') appears multiple times in the override definitions');
-            } else {
-                all_overrides.push(override_concat);
-            }
-        }
-
-        // ensure all listed interview timeslots appear in timeslot definitions
-        for (let i = 0; i < config.companies.length; i++) {
-            const company = config.companies[i];
-            for (let j = 0; j < company.teams.length; j++) {
-                const team = company.teams[j];
-                for (let k = 0; k < team.interviewers.length; k++) {
-                    const interviewer = team.interviewers[k];
-                    for (let l = 0; l < interviewer.timeslots.length; l++) {
-                        if (!all_timeslots.includes(interviewer.timeslots[l])) {
-                            return reject('Company ' + i + ', Team ' + j + ', Interviewer ' + k +
-                                ' has the timeslot ' + interviewer.timeslots[l] +
-                                ' which is not listed in the "timeslots"');
-                        }
-                    }
-                }
-            }
-        }
-
-        // ensure all listed students appear in student definitions
-        for (let i = 0; i < config.companies.length; i++) {
-            const company = config.companies[i];
-            for (let j = 0; j < company.teams.length; j++) {
-                const team = company.teams[j];
-                for (let k = 0; k < team.preferences.length; k++) {
-                    if (!all_students.includes(team.preferences[k])) {
-                        return reject('Company ' + i + ', Team ' + j + ' has the student preference ' +
-                            team.preferences[k] + ' which is not listed in the "students"');
-                    }
-                }
-            }
-        }
-        for (let i = 0; i < config.overrides.length; i++) {
-            if (!all_students.includes(config.overrides[i].person)) {
-                return reject('Override ' + i + ' has the student ' + config.overrides[i].person +
-                    ' which is not listed in the "students"');
-            }
-        }
-
-        // ensure all listed teams appear in the company team definitions
-        for (let i = 0; i < config.students.length; i++) {
-            const student = config.students[i];
-            for (let j = 0; j < student.preferences.length; j++) {
-                if (!all_teams.includes(student.preferences[j])) {
-                    return reject('Student ' + i + ' has the preference ' + student.preferences[j] +
-                        ' which is not listed in the teams');
-                }
-            }
-        }
-        for (let i = 0; i < config.overrides.length; i++) {
-            if (!all_teams.includes(config.overrides[i].team)) {
-                return reject('Override ' + i + ' has the team ' + config.overrides[i].team +
-                    ' which is not listed in the teams');
-            }
-        }
-
-        return resolve();
+        scheduler.model.id_lookup.init_module();
     };
 
     const set_config = function (c) {
@@ -209,8 +15,10 @@ scheduler.model = (function () {
             solved_model = null;
             config = c;
             _add_default_settings();
-            return _validate_config(resolve, reject);
+            return resolve();
         })
+            .then(scheduler.model.validation.validate_config)
+            .then(scheduler.model.id_lookup.create_id_lookup);
     };
 
     const get_solved_model = function () {
@@ -243,7 +51,7 @@ scheduler.model = (function () {
         solved_model = null;
         _var_name_to_data_map = null;
 
-        let overrides = config[scheduler.constants.OVERRIDES];
+        let overrides = config.overrides;
 
         for (let i = 0; i < overrides.length; i++) {
             const over = overrides[i];
@@ -254,7 +62,7 @@ scheduler.model = (function () {
         }
 
         if (new_val !== null) {
-            config[scheduler.constants.OVERRIDES].push({
+            config.overrides.push({
                 person: student_name,
                 team: team_name,
                 value: new_val
@@ -272,7 +80,7 @@ scheduler.model = (function () {
             for (let idx_time = 0; idx_time < day_timeslots.length; idx_time++) {
                 let window_base_time = day_timeslots[idx_time];
 
-                for (let idx_window = idx_time; (idx_window < idx_time + config[scheduler.constants.SETTINGS][scheduler.constants.TIME_WINDOW_SIZE]) && (idx_window < day_timeslots.length); idx_window++) {
+                for (let idx_window = idx_time; (idx_window < idx_time + config.settings[scheduler.constants.TIME_WINDOW_SIZE]) && (idx_window < day_timeslots.length); idx_window++) {
                     let time = day_timeslots[idx_window];
                     let timeslot = day + "_" + time;
                     if (!timeslot_to_window_map.hasOwnProperty(timeslot)) {
@@ -299,9 +107,9 @@ scheduler.model = (function () {
     const _create_ampl_model = function () {
         _var_name_to_data_map = {};
 
-        let company_configs = config[scheduler.constants.COMPANIES];
-        let student_configs = config[scheduler.constants.STUDENTS];
-        let timeslot_to_window_map = _create_window_mappings(config[scheduler.constants.TIMESLOTS]);
+        let company_configs = config.companies;
+        let student_configs = config.students;
+        let timeslot_to_window_map = _create_window_mappings(config.timeslots);
 
         let var_names = [];
         let score_terms = [];
@@ -336,28 +144,28 @@ scheduler.model = (function () {
                             let is_student_pref = student.preferences.indexOf(team.name) > -1;
                             let is_team_pref = team.preferences.indexOf(student.name) > -1;
 
-                            let over_val = _get_override_val(config[scheduler.constants.OVERRIDES], s_name, t_name);
+                            let over_val = _get_override_val(config.overrides, s_name, t_name);
 
                             let score = 0;
                             if (is_student_pref && is_team_pref) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_MUTUAL_PREF_SCORE];
+                                score += config.settings[scheduler.constants.IS_MUTUAL_PREF_SCORE];
                             } else if (is_student_pref) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_STUDENT_PREF_SCORE];
+                                score += config.settings[scheduler.constants.IS_STUDENT_PREF_SCORE];
                             } else if (is_team_pref) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.IS_TEAM_PREF_SCORE];
+                                score += config.settings[scheduler.constants.IS_TEAM_PREF_SCORE];
                             }
 
                             let difficulty_diff = student.difficulty - team.difficulty;
                             if (difficulty_diff === 2) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_2_SCORE];
+                                score += config.settings[scheduler.constants.DIFFICULTY_DIFF_2_SCORE];
                             } else if (difficulty_diff === 1) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_1_SCORE];
+                                score += config.settings[scheduler.constants.DIFFICULTY_DIFF_1_SCORE];
                             } else if (difficulty_diff === 0) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_0_SCORE];
+                                score += config.settings[scheduler.constants.DIFFICULTY_DIFF_0_SCORE];
                             } else if (difficulty_diff === -1) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE];
+                                score += config.settings[scheduler.constants.DIFFICULTY_DIFF_MINUS1_SCORE];
                             } else if (difficulty_diff === -2) {
-                                score += config[scheduler.constants.SETTINGS][scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
+                                score += config.settings[scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
                             }
 
                             _var_name_to_data_map[var_name] = {
@@ -378,8 +186,8 @@ scheduler.model = (function () {
                             // make sure each student interviews with at least n teams and at most m teams
                             _create_cnstrt_and_push(constraints_map, 'c1', s_name, var_name,
                                 {
-                                    min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_STUDENT],
-                                    max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_STUDENT]
+                                    min: config.settings[scheduler.constants.MIN_INTERVIEW_PER_STUDENT],
+                                    max: config.settings[scheduler.constants.MAX_INTERVIEW_PER_STUDENT]
                                 }
                             );
 
@@ -389,7 +197,7 @@ scheduler.model = (function () {
                             // make sure each interviewer has at least n interviews
                             _create_cnstrt_and_push(constraints_map, 'c3', i_name, var_name,
                                 {
-                                    min: config[scheduler.constants.SETTINGS][scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER]
+                                    min: config.settings[scheduler.constants.MIN_INTERVIEW_PER_INTERVIEWER]
                                 }
                             );
 
@@ -399,7 +207,7 @@ scheduler.model = (function () {
                             // make sure each student interviews with each company at most n times
                             _create_cnstrt_and_push(constraints_map, 'c5', s_name + "_" + c_name, var_name,
                                 {
-                                        max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT]
+                                        max: config.settings[scheduler.constants.MAX_INTERVIEWS_AT_COMPANY_PER_STUDENT]
                                 }
                             );
 
@@ -411,7 +219,7 @@ scheduler.model = (function () {
                                 _create_cnstrt_and_push(constraints_map, 'c7', s_name, var_name,
                                     {
                                         min: Math.min(
-                                            config[scheduler.constants.SETTINGS][scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
+                                            config.settings[scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
                                             student.preferences.length
                                         )
                                     }
@@ -423,7 +231,7 @@ scheduler.model = (function () {
                                 _create_cnstrt_and_push(constraints_map, 'c8', t_name, var_name,
                                     {
                                         min: Math.min(
-                                            config[scheduler.constants.SETTINGS][scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
+                                            config.settings[scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
                                             team.preferences.length
                                         )
                                     }
@@ -431,7 +239,7 @@ scheduler.model = (function () {
                             }
 
                             // if preferences align, make sure interview occurs
-                            if (config[scheduler.constants.SETTINGS][scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref) {
+                            if (config.settings[scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref) {
                                 _create_cnstrt_and_push(constraints_map, 'c9', s_name + "_" + t_name, var_name, { min: 1 });
                             }
 
@@ -445,7 +253,7 @@ scheduler.model = (function () {
                                 let window = timeslot_to_window_map[timeslot][idx_window];
                                 _create_cnstrt_and_push(constraints_map, 'c11', s_name + "_" + window, var_name,
                                     {
-                                        max: config[scheduler.constants.SETTINGS][scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW]
+                                        max: config.settings[scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW]
                                     }
                                 );
                             }
@@ -616,8 +424,8 @@ scheduler.model = (function () {
             }
         };
 
-        _add_val_if_not_exists(config, scheduler.constants.SETTINGS, {});
-        const settings = config[scheduler.constants.SETTINGS];
+        _add_val_if_not_exists(config, 'settings', {});
+        const settings = config.settings;
 
         // constraints
 
@@ -678,7 +486,7 @@ scheduler.model = (function () {
     const update_setting = function (setting_key, new_val) {
         solved_model = null;
         _var_name_to_data_map = null;
-        config[scheduler.constants.SETTINGS][setting_key] = new_val;
+        config.settings[setting_key] = new_val;
     };
 
     const get_config = function () {

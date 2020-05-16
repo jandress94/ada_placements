@@ -1,10 +1,4 @@
 module.exports = {
-    SETTINGS: "settings",
-    COMPANIES: "companies",
-    TIMESLOTS: "timeslots",
-    STUDENTS: "students",
-    OVERRIDES: "overrides",
-
     // constraints
     MAX_INTERVIEW_PER_STUDENT: "max_interviews_per_student",
     DEFAULT_MAX_INTERVIEW_PER_STUDENT: 6,
