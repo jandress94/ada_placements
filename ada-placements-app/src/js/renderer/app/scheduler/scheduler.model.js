@@ -168,6 +168,8 @@ scheduler.model = (function () {
                                 score += config.settings[scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
                             }
 
+                            score += (2 * Math.random() - 1) * config.settings[scheduler.constants.RANDOM_SCORE_MAX];
+
                             _var_name_to_data_map[var_name] = {
                                 student_name: student.name,
                                 company_name: company.name,
@@ -314,6 +316,7 @@ scheduler.model = (function () {
 
         // Check for error
         if (results.indexOf('PRIMAL_FEASIBLE') < 0) {
+            // TODO: check for specific constraint presolved.
             return results;
         }
 
@@ -495,6 +498,9 @@ scheduler.model = (function () {
 
         _add_val_if_not_exists(settings, scheduler.constants.IS_MUTUAL_PREF_SCORE,
             scheduler.constants.DEFAULT_IS_MUTUAL_PREF_SCORE);
+
+        _add_val_if_not_exists(settings, scheduler.constants.RANDOM_SCORE_MAX,
+            scheduler.constants.DEFAULT_RANDOM_SCORE_MAX);
     };
 
     const update_setting = function (setting_key, new_val) {

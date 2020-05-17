@@ -37,4 +37,7 @@ module.exports = {
     DEFAULT_IS_TEAM_PREF_SCORE: 4,
     IS_MUTUAL_PREF_SCORE: "is_mutual_pref_score",
     DEFAULT_IS_MUTUAL_PREF_SCORE: 6,
+
+    RANDOM_SCORE_MAX: "random_score_max",
+    DEFAULT_RANDOM_SCORE_MAX: 0.0
 };

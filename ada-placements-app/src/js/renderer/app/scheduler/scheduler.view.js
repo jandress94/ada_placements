@@ -189,6 +189,7 @@ scheduler.view = (function () {
         scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_STUDENT_PREF_SCORE,"Student Preference Score"));
         scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_TEAM_PREF_SCORE,"Team Preference Score"));
         scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.IS_MUTUAL_PREF_SCORE,"Mutual Preference Score"));
+        scoring_div.appendChild(_create_num_setting(settings, scheduler.constants.RANDOM_SCORE_MAX, "Max Random Score"));
         /***************************calculate button***************************/
 
         let calculate_div = document.createElement('div');
