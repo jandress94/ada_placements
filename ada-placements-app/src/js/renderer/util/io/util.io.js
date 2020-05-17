@@ -8,24 +8,6 @@ util.io = (function () {
         util.io.constants = require('../js/renderer/util/io/constants');
     };
 
-    const get_google_oAuth = function () {
-        return new Promise((resolve, reject) => {
-            if (google_oAuth2Client === null) {
-                return fs.readFile(util.io.constants.GOOGLE_CREDENTIALS_PATH)
-                    .then(credentials => {
-                        const {client_secret, client_id, redirect_uris} = JSON.parse(credentials).installed;
-                        google_oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-                        return resolve(google_oAuth2Client);
-                    })
-                    .catch(err => {
-                        return reject('Error loading Google credentials file: ' + err);
-                    });
-            }
-
-            return resolve(google_oAuth2Client);
-        });
-    };
-
     const sheet_url_to_sheet_id = function (sheetUrl) {
         if (sheetUrl.match(/^[a-zA-Z0-9-_]+$/g) != null) {
             return sheetUrl;
@@ -52,6 +34,34 @@ util.io = (function () {
                     return {canceled: true};
                 }
             });
+    };
+
+    const create_google_creds = function () {
+        return new Promise((resolve, reject) => {
+            return util.io.view.get_google_creds()
+                .then(file_path => {
+                    return fs.copyFile(file_path, util.io.constants.GOOGLE_CREDENTIALS_PATH)
+                        .then(resolve);
+                })
+                .catch(err => reject(err));
+        });
+    };
+
+    const get_google_creds = function () {
+        return new Promise((resolve, reject) => {
+            return fs.access(util.io.constants.GOOGLE_CREDENTIALS_PATH)
+                .catch(() => {
+                    return create_google_creds();
+                })
+                .catch(err => reject('Problem creating Google Credentials: ' + err))
+                .then(() => {
+                    return fs.readFile(util.io.constants.GOOGLE_CREDENTIALS_PATH)
+                        // TODO add in validation of structure?
+                        .then(credentials => resolve(JSON.parse(credentials)))
+                        .catch(err => reject('Problem reading Google Credentials from file '
+                            + util.io.constants.GOOGLE_CREDENTIALS_PATH + ' Error: ' + err));
+                });
+        });
     };
 
     const create_google_token = function (oAuth) {
@@ -90,6 +100,20 @@ util.io = (function () {
                         .catch(err => reject('Problem reading Google Token: ' + err));
                 });
         });
+    };
+
+    const get_google_oAuth = function () {
+        return get_google_creds()
+            .then(credentials => {
+                try {
+                    const {client_secret, client_id, redirect_uris} = credentials.installed;
+                    google_oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+                    return google_oAuth2Client;
+                } catch (err) {
+                    return Promise.reject('The Google Credentials file stored at '
+                        + util.io.constants.GOOGLE_CREDENTIALS_PATH + ' does not have the expected structure.');
+                }
+            });
     };
 
     const get_google_sheets = function() {
