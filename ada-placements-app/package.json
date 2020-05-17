@@ -23,7 +23,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "/Users/jim/Documents/ada_placements/ada-placements-app/src/Icon/adaIcon.icns"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -49,8 +51,11 @@
     }
   },
   "dependencies": {
+    "convert-array-to-csv": "^1.0.12",
     "csv-parse": "^4.8.5",
+    "electron-context-menu": "^2.0.1",
     "electron-squirrel-startup": "^1.0.0",
+    "googleapis": "^51.0.0",
     "javascript-lp-solver": "^0.4.24",
     "minimist": "^1.2.5"
   },
