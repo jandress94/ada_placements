@@ -62,6 +62,16 @@ scheduler.controller = (function () {
             .catch(err => alert(err));
     };
 
+    const handle_save_config_button_clicked = function () {
+        scheduler.model.save_config_to_file()
+            .then(save_state => {
+                if (save_state.state === 'success') {
+                    alert("Save successful");
+                }
+            })
+            .catch(alert);
+    };
+
     return {
         get_landing_generator_fn: get_landing_generator_fn,
         handle_load_file: handle_load_file,
@@ -71,6 +81,7 @@ scheduler.controller = (function () {
         handle_overwrite_changed: handle_overwrite_changed,
         display_config_page: display_config_page,
         handle_save_to_sheet: handle_save_to_sheet,
-        handle_save_to_csv: handle_save_to_csv
+        handle_save_to_csv: handle_save_to_csv,
+        handle_save_config_button_clicked: handle_save_config_button_clicked
     };
 }());

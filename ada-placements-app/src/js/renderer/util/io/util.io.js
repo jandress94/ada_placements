@@ -154,6 +154,20 @@ util.io = (function () {
         });
     };
 
+    const save_to_json = function(data_fn) {
+        return dialog.showSaveDialog({
+            filters: [
+                { name: 'JSON', extensions: ['json'] }
+            ]
+        }).then(result => {
+            if (!result.canceled) {
+                return save_to_file(result.filePath, () => JSON.stringify(data_fn(), null, '\t'));
+            } else {
+                return {state: 'canceled'};
+            }
+        });
+    };
+
     const save_to_sheet = function (sheet_title, data_array_fn) {
         const resource_create = {
             properties: {
@@ -192,6 +206,7 @@ util.io = (function () {
         get_google_sheet_id: get_google_sheet_id,
         load_google_sheet_data: load_google_sheet_data,
         save_to_csv: save_to_csv,
-        save_to_sheet: save_to_sheet
+        save_to_sheet: save_to_sheet,
+        save_to_json: save_to_json
     };
 }());

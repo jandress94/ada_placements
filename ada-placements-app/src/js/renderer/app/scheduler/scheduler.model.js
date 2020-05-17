@@ -572,6 +572,10 @@ scheduler.model = (function () {
         );
     };
 
+    const save_config_to_file = function () {
+        return util.io.save_to_json(() => get_config());
+    };
+
     return {
         init_module: init_module,
         set_config: set_config,
@@ -580,6 +584,7 @@ scheduler.model = (function () {
         get_solved_model: get_solved_model,
         update_overwrite: update_overwrite,
         save_schedule_to_sheets: save_schedule_to_sheets,
-        save_schedule_to_csv: save_schedule_to_csv
+        save_schedule_to_csv: save_schedule_to_csv,
+        save_config_to_file: save_config_to_file
     };
 }());

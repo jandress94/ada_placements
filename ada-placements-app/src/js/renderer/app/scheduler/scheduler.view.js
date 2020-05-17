@@ -202,6 +202,18 @@ scheduler.view = (function () {
         $(calculate_button).click(function() {
             scheduler.controller.handle_calculate_button_clicked();
         });
+
+        /****************************save config button****************************/
+        let save_config_div = document.createElement('div');
+        $container.append(save_config_div);
+
+        let save_config_button = document.createElement('button');
+        save_config_div.appendChild(save_config_button);
+
+        save_config_button.appendChild(document.createTextNode('Save Config'));
+        $(save_config_button).click(function () {
+            scheduler.controller.handle_save_config_button_clicked();
+        });
     };
 
     const _create_table_entry = function(content) {
