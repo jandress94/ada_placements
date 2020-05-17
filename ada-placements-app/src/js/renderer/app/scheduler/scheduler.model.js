@@ -233,7 +233,7 @@ scheduler.model = (function () {
                             _create_cnstrt_and_push(constraints_map, 'constraint_6', sid + "_" + tid, var_name, { max: 1 });
 
                             // make sure each student interviews with at least n of their preferences
-                            if (is_student_pref) {
+                            if (is_student_pref && (over_val === null || over_val)) {
                                 _create_cnstrt_and_push(constraints_map, 'constraint_7', sid, var_name,
                                     {
                                         min: Math.min(
@@ -245,7 +245,7 @@ scheduler.model = (function () {
                             }
 
                             // make sure each team interviews with at least n of their preferences
-                            if (is_team_pref) {
+                            if (is_team_pref && (over_val === null || over_val)) {
                                 _create_cnstrt_and_push(constraints_map, 'constraint_8', tid, var_name,
                                     {
                                         min: Math.min(
