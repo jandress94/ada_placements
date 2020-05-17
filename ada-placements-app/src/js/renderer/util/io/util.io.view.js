@@ -141,7 +141,7 @@ util.io.view = (function () {
 
             let input_p = document.createElement('p');
             auth_code_div.appendChild(input_p);
-            input_p.appendChild(document.createTextNode('Paste the URL into a web browser, and enter the code from that page here: '));
+            input_p.appendChild(document.createTextNode('Paste the URL into a web browser, follow the prompts, and enter the code from that page here: '));
 
             let auth_code_input = document.createElement('input');
             auth_code_div.appendChild(auth_code_input);
