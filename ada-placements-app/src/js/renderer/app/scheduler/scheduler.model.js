@@ -107,6 +107,19 @@ scheduler.model = (function () {
         c_map[c][c_key].vars.push(v);
     };
 
+    const _get_num_allowed_prefs = function (student_names, team_names) {
+        let count = 0;
+        for (let i = 0; i < student_names.length; i++) {
+            for (let j = 0; j < team_names.length; j++) {
+                let over_val = _get_override_val(config.overrides, student_names[i], team_names[j]);
+                if (over_val === null || over_val){
+                    count++;
+                }
+            }
+        }
+        return count;
+    };
+
     const _create_ampl_model = function () {
         _var_name_to_data_map = {};
 
@@ -143,6 +156,9 @@ scheduler.model = (function () {
 
                             let is_student_pref = student.preferences.indexOf(team.name) > -1;
                             let is_team_pref = team.preferences.indexOf(student.name) > -1;
+
+                            let num_allowed_student_prefs = _get_num_allowed_prefs([student.name], student.preferences);
+                            let num_allowed_team_prefs = _get_num_allowed_prefs(team.preferences, [team.name]);
 
                             let over_val = _get_override_val(config.overrides, student.name, team.name);
 
@@ -222,7 +238,7 @@ scheduler.model = (function () {
                                     {
                                         min: Math.min(
                                             config.settings[scheduler.constants.MIN_STUDENT_PREFS_GUARANTEED],
-                                            student.preferences.length
+                                            num_allowed_student_prefs
                                         )
                                     }
                                 );
@@ -234,14 +250,14 @@ scheduler.model = (function () {
                                     {
                                         min: Math.min(
                                             config.settings[scheduler.constants.MIN_TEAM_PREFS_GUARANTEED_PER_POSITION] * team.positions,
-                                            team.preferences.length
+                                            num_allowed_team_prefs
                                         )
                                     }
                                 );
                             }
 
                             // if preferences align, make sure interview occurs
-                            if (config.settings[scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref) {
+                            if (config.settings[scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW] && is_student_pref && is_team_pref && (over_val === null || over_val)) {
                                 _create_cnstrt_and_push(constraints_map, 'constraint_9', sid + "_" + tid, var_name, { min: 1 });
                             }
 

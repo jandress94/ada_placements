@@ -56,7 +56,6 @@ util.io = (function () {
                 .catch(err => reject('Problem creating Google Credentials: ' + err))
                 .then(() => {
                     return fs.readFile(util.io.constants.GOOGLE_CREDENTIALS_PATH)
-                        // TODO add in validation of structure?
                         .then(credentials => resolve(JSON.parse(credentials)))
                         .catch(err => reject('Problem reading Google Credentials from file '
                             + util.io.constants.GOOGLE_CREDENTIALS_PATH + ' Error: ' + err));
