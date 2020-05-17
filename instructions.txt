@@ -1,0 +1,3 @@
+to build, "npm run make"
+
+to install packages, "npm install PACKAGE --save"
