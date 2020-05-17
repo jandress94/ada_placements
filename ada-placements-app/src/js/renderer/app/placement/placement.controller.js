@@ -59,6 +59,7 @@ placement.controller = (function () {
 
     const handle_save_to_sheet = function () {
         placement.model.save_placements_to_sheet()
+        // TODO: if this is where you first set up the google creds/tokens, it won't switch back to the schedule after authorizing.
             .then(spreadsheetid => alert('Saved placements to spreadsheet ' + spreadsheetid))
             .catch(alert);
     };

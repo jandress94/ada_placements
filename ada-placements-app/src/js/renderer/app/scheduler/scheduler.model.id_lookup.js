@@ -55,9 +55,6 @@ scheduler.model.id_lookup = (function () {
                 name_to_id.student[student.name] = 's' + i;
             }
 
-            console.log(id_to_name);
-            console.log(name_to_id);
-
             return resolve();
         });
     };

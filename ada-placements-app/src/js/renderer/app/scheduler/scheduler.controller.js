@@ -26,9 +26,7 @@ scheduler.controller = (function () {
     const handle_calculate_button_clicked = function() {
         scheduler.view.clear_container();
         scheduler.model.get_solved_model()
-            .then(function(solved_model) {
-                scheduler.view.display_schedule(solved_model)
-            })
+            .then(scheduler.view.display_schedule)
             .catch(function (err) {
                 alert(err);
                 scheduler.view.display_configs(scheduler.model.get_config());
@@ -49,6 +47,7 @@ scheduler.controller = (function () {
 
     const handle_save_to_sheet = function () {
         scheduler.model.save_schedule_to_sheets()
+        // TODO: if this is where you first set up the google creds/tokens, it won't switch back to the schedule after authorizing.
             .then(spreadsheetId => alert('Saved interview schedule to spreadsheet ' + spreadsheetId))
             .catch(alert);
     };
