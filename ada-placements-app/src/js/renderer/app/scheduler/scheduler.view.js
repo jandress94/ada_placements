@@ -171,6 +171,7 @@ scheduler.view = (function () {
         constraint_div.appendChild(_create_bool_setting(settings, scheduler.constants.REQUIRE_MUTUAL_PREFS_TO_INTERVIEW,"Require Mutual Preferences to Interview"));
         constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.TIME_WINDOW_SIZE,"Time Window Size", 1));
         constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW,"Max Interviews per Time Window per Student", 1));
+        constraint_div.appendChild(_create_num_setting(settings, scheduler.constants.MAX_INTERVIEWS_PER_DAY, "Max Interviews per Day per Student", 1));
 
         /***************************settings (scoring)***************************/
 

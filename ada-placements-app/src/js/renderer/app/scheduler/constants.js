@@ -18,6 +18,8 @@ module.exports = {
     DEFAULT_TIME_WINDOW_SIZE: 2,
     MAX_INTERVIEW_PER_TIME_WINDOW: "max_interviews_per_time_window",
     DEFAULT_MAX_INTERVIEW_PER_TIME_WINDOW: 1,
+    MAX_INTERVIEWS_PER_DAY: "max_interviews_per_day",
+    DEFAULT_MAX_INTERVIEWS_PER_DAY: 3,
 
     // scoring
     DIFFICULTY_DIFF_2_SCORE: "difficulty_diff_2_score",

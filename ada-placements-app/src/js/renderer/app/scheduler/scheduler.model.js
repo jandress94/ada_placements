@@ -145,6 +145,7 @@ scheduler.model = (function () {
 
                         for (let idx_slot = 0; idx_slot < interviewer.timeslots.length; idx_slot++) {
                             let timeslot = interviewer.timeslots[idx_slot];
+                            let day = timeslot.substr(0, timeslot.indexOf('_'));
 
                             let sid = scheduler.model.id_lookup.student.to_id(student.name);
                             let cid = scheduler.model.id_lookup.company.to_id(company.name);
@@ -275,6 +276,13 @@ scheduler.model = (function () {
                                     }
                                 );
                             }
+
+                            // make sure each student only has up to n interviews per day
+                            _create_cnstrt_and_push(constraints_map, 'constraint_12', sid + "_" + day, var_name,
+                                {
+                                    max: config.settings[scheduler.constants.MAX_INTERVIEWS_PER_DAY]
+                                }
+                            );
                         }
                     }
                 }
@@ -488,6 +496,9 @@ scheduler.model = (function () {
 
         _add_val_if_not_exists(settings, scheduler.constants.MAX_INTERVIEW_PER_TIME_WINDOW,
             scheduler.constants.DEFAULT_MAX_INTERVIEW_PER_TIME_WINDOW);
+
+        _add_val_if_not_exists(settings, scheduler.constants.MAX_INTERVIEWS_PER_DAY,
+            scheduler.constants.DEFAULT_MAX_INTERVIEWS_PER_DAY);
 
         // scoring
 
