@@ -120,13 +120,49 @@ placement.view = (function () {
         return scores_table;
     };
 
-    const display_scores_page = function (scores) {
+    const _create_num_setting = function (settings, setting_key, setting_text, step_val) {
+        let setting_container = document.createElement('div');
+
+        let setting_elem = document.createElement('input');
+        setting_elem.setAttribute("type", "number");
+
+        if (step_val === undefined) {
+            step_val = "any";
+        }
+        setting_elem.setAttribute("step", step_val.toString());
+        setting_elem.value = settings[setting_key];
+
+        $(setting_elem).change(function() {
+            placement.controller.handle_setting_change(setting_key, Number(setting_elem.value));
+        });
+
+        let setting_label = document.createElement("label");
+        setting_label.setAttribute("for", setting_elem.id);
+        setting_label.appendChild(document.createTextNode(setting_text));
+
+        setting_container.appendChild(setting_elem);
+        setting_container.appendChild(setting_label);
+
+        return setting_container;
+    };
+
+    const display_scores_page = function (scores, settings) {
         clear_container();
 
         let scores_div = document.createElement('div');
         $container.append(scores_div);
 
         scores_div.appendChild(_create_table_for_scores(scores));
+
+        let settings_div = document.createElement('div');
+        $container.append(settings_div);
+
+        let constraints_h1 = document.createElement('h1');
+        constraints_h1.appendChild(document.createTextNode('Constraint Settings'));
+        settings_div.appendChild(constraints_h1);
+
+        settings_div.appendChild(_create_num_setting(settings, placement.constants.MIN_STUDENT_SCORE,"Min Student Score"));
+        settings_div.appendChild(_create_num_setting(settings, placement.constants.MIN_TEAM_SCORE,"Min Team Score"));
 
         let calculate_div = document.createElement('div');
         $container.append(calculate_div);

@@ -2,11 +2,13 @@ placement.model = (function () {
     let scores;
     let id_to_score;
     let solved_model;
+    let settings;
 
     const init_module = function () {
         scores = null;
         id_to_score = null;
         solved_model = null;
+        settings = null;
     };
 
     const compute_join_score = function(person_score, company_score) {
@@ -15,6 +17,10 @@ placement.model = (function () {
 
     const get_scores = function () {
         return scores;
+    };
+
+    const get_settings = function () {
+        return settings;
     };
 
     const get_solved_model = function () {
@@ -57,11 +63,21 @@ placement.model = (function () {
 
             scores.push(score_entry);
         }
+
+        settings = {
+            [placement.constants.MIN_STUDENT_SCORE]: placement.constants.DEFAULT_MIN_STUDENT_SCORE,
+            [placement.constants.MIN_TEAM_SCORE]: placement.constants.DEFAULT_MIN_TEAM_SCORE
+        };
     };
 
     const update_overwrite = function (score_id, new_val) {
         solved_model = null;
         id_to_score[score_id].overwrite = new_val;
+    };
+
+    const update_setting = function (setting_key, new_val) {
+        solved_model = null;
+        settings[setting_key] = new_val;
     };
 
     const solve_model = function () {
@@ -75,6 +91,11 @@ placement.model = (function () {
             let personConstraint = "person_" + r.person;
             let companyConstraint = "company_" + r.company;
             let overwriteConstraint = "overwrite_" + r.person + "_" + r.company;
+
+            if (r.person_score < settings[placement.constants.MIN_STUDENT_SCORE] ||
+                r.company_score < settings[placement.constants.MIN_TEAM_SCORE]) {
+                continue;
+            }
 
             variables[personCompanyVar] = {
                 id: r.id,
@@ -170,10 +191,12 @@ placement.model = (function () {
     return {
         init_module: init_module,
         get_scores: get_scores,
+        get_settings: get_settings,
         load_scores_from_array: load_scores_from_array,
         update_overwrite: update_overwrite,
         get_solved_model: get_solved_model,
         save_placements_to_csv: save_placements_to_csv,
-        save_placements_to_sheet: save_placements_to_sheet
+        save_placements_to_sheet: save_placements_to_sheet,
+        update_setting: update_setting
     };
 }());

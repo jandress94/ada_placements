@@ -17,7 +17,7 @@ placement.controller = (function () {
                             skip_empty_lines: true
                         }))
                         .then(placement.model.load_scores_from_array)
-                        .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+                        .then(() => placement.view.display_scores_page(placement.model.get_scores(), placement.model.get_settings()))
                         .catch(alert);
                 }
             });
@@ -29,7 +29,7 @@ placement.controller = (function () {
                 if (!result.canceled) {
                     return util.io.load_google_sheet_data(result.sheet_id, 'A:E')
                         .then(placement.model.load_scores_from_array)
-                        .then(() => placement.view.display_scores_page(placement.model.get_scores()))
+                        .then(() => placement.view.display_scores_page(placement.model.get_scores(), placement.model.get_settings()))
                         .catch(err => {
                             alert(err);
                             landing.start();
@@ -54,7 +54,7 @@ placement.controller = (function () {
     };
 
     const handle_back_to_scores_button_clicked = function () {
-        placement.view.display_scores_page(placement.model.get_scores());
+        placement.view.display_scores_page(placement.model.get_scores(), placement.model.get_settings());
     };
 
     const handle_save_to_sheet = function () {
@@ -74,6 +74,10 @@ placement.controller = (function () {
             .catch(err => alert(err));
     };
 
+    const handle_setting_change = function (setting_key, new_val) {
+        placement.model.update_setting(setting_key, new_val);
+    };
+
     return {
         get_landing_generator_fn: get_landing_generator_fn,
         handle_load_file: handle_load_file,
@@ -82,6 +86,7 @@ placement.controller = (function () {
         handle_calculate_button_clicked: handle_calculate_button_clicked,
         handle_back_to_scores_button_clicked: handle_back_to_scores_button_clicked,
         handle_save_to_sheet: handle_save_to_sheet,
-        handle_save_to_csv: handle_save_to_csv
+        handle_save_to_csv: handle_save_to_csv,
+        handle_setting_change: handle_setting_change
     };
 }());
