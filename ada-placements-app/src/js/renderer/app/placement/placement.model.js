@@ -9,6 +9,10 @@ placement.model = (function () {
         solved_model = null;
     };
 
+    const compute_join_score = function(person_score, company_score) {
+        return person_score * company_score;
+    };
+
     const get_scores = function () {
         return scores;
     };
@@ -45,7 +49,7 @@ placement.model = (function () {
                 company: row[1],
                 person_score: row[2],
                 company_score: row[3],
-                score: row[2] * row[3],
+                score: compute_join_score(row[2], row[3]),
                 overwrite: overwrite
             };
 
@@ -126,7 +130,7 @@ placement.model = (function () {
     };
 
     const _save_placements_to_array = function(scores_array) {
-        let values = [['Person', 'Company', 'Person Score', 'Company Score', 'Overwrite']];
+        let values = [['Person', 'Company', 'Person Score', 'Company Score', 'Joint Score', 'Overwrite']];
         for (let i = 0; i < scores_array.length; i++) {
             let s = scores_array[i];
             values.push([
@@ -134,6 +138,7 @@ placement.model = (function () {
                 s.company,
                 s.person_score,
                 s.company_score,
+                s.score,
                 s.overwrite === null ? s.overwrite : s.overwrite.toString()
             ]);
         }

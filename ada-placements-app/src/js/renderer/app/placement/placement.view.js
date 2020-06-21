@@ -92,7 +92,7 @@ placement.view = (function () {
         let header_row = document.createElement('tr');
         scores_table_head.append(header_row);
 
-        let col_names = ['person', 'company', 'score', 'overwrites'];
+        let col_names = ['person', 'company', 'student score', 'team score', 'joint score', 'overwrites'];
         for (let i = 0; i < col_names.length; i++) {
             let column_name = col_names[i];
             let header = document.createElement('th');
@@ -106,6 +106,8 @@ placement.view = (function () {
             let row = document.createElement('tr');
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].person)));
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].company)));
+            row.appendChild(_create_table_entry(document.createTextNode(scores[i].person_score)));
+            row.appendChild(_create_table_entry(document.createTextNode(scores[i].company_score)));
             row.appendChild(_create_table_entry(document.createTextNode(scores[i].score)));
 
             row.appendChild(_create_table_entry(_create_overwrite_select(scores[i])));
