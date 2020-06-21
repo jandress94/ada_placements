@@ -13,6 +13,18 @@ scheduler.view = (function () {
             title_h1.appendChild(document.createTextNode('Interview Scheduler'));
             scheduler_div.appendChild(title_h1);
 
+            // input instructions
+            let instructions_div = document.createElement('div');
+            scheduler_div.append(instructions_div);
+
+            let instructions_button = document.createElement('button');
+            instructions_div.appendChild(instructions_button);
+            instructions_button.appendChild(document.createTextNode('Input Instructions'));
+
+            $(instructions_button).click(function() {
+                show_instructions_page();
+            });
+
             // Load from file
             let load_file_button = document.createElement('button');
             scheduler_div.appendChild(load_file_button);
@@ -24,6 +36,326 @@ scheduler.view = (function () {
 
             return scheduler_div;
         };
+    };
+
+    const show_instructions_page = function() {
+        clear_container();
+
+        let instructions_div = document.createElement('div');
+        $container.append(instructions_div);
+
+        let title_h1 = document.createElement('h1');
+        title_h1.appendChild(document.createTextNode('Interview Scheduler'));
+        instructions_div.appendChild(title_h1);
+
+        let info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode(
+            "The input data for the interview scheduler is a JSON file giving the details about the interview timeslots, " +
+            "the companies/teams/interviewers, the students, any overrides, and the constraints/scoring criteria. " +
+            "You can go to \"https://jsonformatter.curiousconcept.com\" to validate that the JSON file is formatted correctly. " +
+            "Here is an example of the JSON file: "
+        ));
+
+        let example_json_area = document.createElement('textarea');
+        instructions_div.appendChild(example_json_area);
+
+        example_json_area.setAttribute("rows", "16");
+        example_json_area.setAttribute("cols", "100");
+        example_json_area.value =
+            "{\n" +
+            "\t\"timeslots\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"day\": \"Monday\",\n" +
+            "\t\t\t\"times\": [\n" +
+            "\t\t\t\t\"1\",\n" +
+            "\t\t\t\t\"2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"day\": \"Tuesday\",\n" +
+            "\t\t\t\"times\": [\n" +
+            "\t\t\t\t\"1\",\n" +
+            "\t\t\t\t\"2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"day\": \"Wednesday\",\n" +
+            "\t\t\t\"times\": [\n" +
+            "\t\t\t\t\"1\",\n" +
+            "\t\t\t\t\"2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"day\": \"Thursday\",\n" +
+            "\t\t\t\"times\": [\n" +
+            "\t\t\t\t\"1\",\n" +
+            "\t\t\t\t\"2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"day\": \"Friday\",\n" +
+            "\t\t\t\"times\": [\n" +
+            "\t\t\t\t\"1\",\n" +
+            "\t\t\t\t\"2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t}\n" +
+            "\t],\n" +
+            "\t\"companies\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Ada Developers Academy\",\n" +
+            "\t\t\t\"teams\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"name\": \"Ada Developers Academy Team 1\",\n" +
+            "\t\t\t\t\t\"positions\": 1,\n" +
+            "\t\t\t\t\t\"difficulty\": 3,\n" +
+            "\t\t\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\t\t\"Ada Lovelace\"\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"interviewers\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"Alice\",\n" +
+            "\t\t\t\t\t\t\t\"timeslots\": [\n" +
+            "\t\t\t\t\t\t\t\t\"Monday_1\",\n" +
+            "\t\t\t\t\t\t\t\t\"Monday_2\"\n" +
+            "\t\t\t\t\t\t\t]\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t]\n" +
+            "\t\t\t\t},\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"name\": \"Ada Developers Academy Team 2\",\n" +
+            "\t\t\t\t\t\"positions\": 1,\n" +
+            "\t\t\t\t\t\"difficulty\": 1,\n" +
+            "\t\t\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\t\t\"Moby\",\n" +
+            "\t\t\t\t\t\t\"Emma\"\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"interviewers\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"Bob\",\n" +
+            "\t\t\t\t\t\t\t\"timeslots\": [\n" +
+            "\t\t\t\t\t\t\t\t\"Tuesday_1\",\n" +
+            "\t\t\t\t\t\t\t\t\"Tuesday_2\"\n" +
+            "\t\t\t\t\t\t\t]\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t]\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Lirio, LLC\",\n" +
+            "\t\t\t\"teams\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"name\": \"Lirio Team 1\",\n" +
+            "\t\t\t\t\t\"positions\": 2,\n" +
+            "\t\t\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\t\t\"Jim\",\n" +
+            "\t\t\t\t\t\t\"Ada Lovelace\",\n" +
+            "\t\t\t\t\t\t\"Emma\"\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"interviewers\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"Carla\",\n" +
+            "\t\t\t\t\t\t\t\"timeslots\": [\n" +
+            "\t\t\t\t\t\t\t\t\"Friday_1\",\n" +
+            "\t\t\t\t\t\t\t\t\"Friday_2\"\n" +
+            "\t\t\t\t\t\t\t]\n" +
+            "\t\t\t\t\t\t},\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"Daniel\",\n" +
+            "\t\t\t\t\t\t\t\"timeslots\": [\n" +
+            "\t\t\t\t\t\t\t\t\"Thursday_1\",\n" +
+            "\t\t\t\t\t\t\t\t\"Thursday_2\"\n" +
+            "\t\t\t\t\t\t\t]\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t]\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Acme Corporation\",\n" +
+            "\t\t\t\"teams\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"name\": \"Acme Team 1\",\n" +
+            "\t\t\t\t\t\"positions\": 1,\n" +
+            "\t\t\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\t\t\"Alan Turing\"\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"interviewers\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"Ellen\",\n" +
+            "\t\t\t\t\t\t\t\"timeslots\": [\n" +
+            "\t\t\t\t\t\t\t\t\"Wednesday_1\",\n" +
+            "\t\t\t\t\t\t\t\t\"Wednesday_2\"\n" +
+            "\t\t\t\t\t\t\t]\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t]\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t]\n" +
+            "\t\t}\n" +
+            "\t],\n" +
+            "\t\"students\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Jim\",\n" +
+            "\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\"Ada Developers Academy Team 2\",\n" +
+            "\t\t\t\t\"Lirio Team 1\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Emma\",\n" +
+            "\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\"Ada Developers Academy Team 1\",\n" +
+            "\t\t\t\t\"Lirio Team 1\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Moby\",\n" +
+            "\t\t\t\"difficulty\": 1,\n" +
+            "\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\"Lirio Team 1\",\n" +
+            "\t\t\t\t\"Acme Team 1\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Ada Lovelace\",\n" +
+            "\t\t\t\"difficulty\": 3,\n" +
+            "\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\"Ada Developers Academy Team 1\",\n" +
+            "\t\t\t\t\"Ada Developers Academy Team 2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"name\": \"Alan Turing\",\n" +
+            "\t\t\t\"difficulty\": 3,\n" +
+            "\t\t\t\"preferences\": [\n" +
+            "\t\t\t\t\"Acme Team 1\",\n" +
+            "\t\t\t\t\"Ada Developers Academy Team 2\"\n" +
+            "\t\t\t]\n" +
+            "\t\t}\n" +
+            "\t],\n" +
+            "\t\"overrides\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"person\": \"Jim\",\n" +
+            "\t\t\t\"team\": \"Lirio Team 1\",\n" +
+            "\t\t\t\"value\": true\n" +
+            "\t\t}\n" +
+            "\t],\n" +
+            "\t\"settings\": {\n" +
+            "\t\t\"max_interviews_per_student\": 2,\n" +
+            "\t\t\"min_interviews_per_student\": 2,\n" +
+            "\t\t\"min_interviews_per_interviewer\": 2,\n" +
+            "\t\t\"max_interviews_at_company_per_student\": 2,\n" +
+            "\t\t\"min_student_prefs_guaranteed\": 1,\n" +
+            "\t\t\"min_team_prefs_guaranteed_per_position\": 1,\n" +
+            "\t\t\"require_mutual_pres_to_interview\": true,\n" +
+            "\t\t\"time_window_size\": 2,\n" +
+            "\t\t\"max_interviews_per_time_window\": 1,\n" +
+            "\t\t\"max_interviews_per_day\": 3,\n" +
+            "\t\t\"difficulty_diff_2_score\": 5,\n" +
+            "\t\t\"difficulty_diff_1_score\": 1,\n" +
+            "\t\t\"difficulty_diff_0_score\": 0,\n" +
+            "\t\t\"difficulty_diff_minus1_score\": -5,\n" +
+            "\t\t\"difficulty_diff_minus2_score\": -25,\n" +
+            "\t\t\"is_student_pref_score\": 1,\n" +
+            "\t\t\"is_team_pref_score\": 4,\n" +
+            "\t\t\"is_mutual_pref_score\": 6,\n" +
+            "\t\t\"random_score_max\": 0\n" +
+            "\t}\n" +
+            "}";
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode("Information about the various sections is below."));
+
+        let info_ul = document.createElement('ul');
+        instructions_div.appendChild(info_ul);
+
+        info_ul.innerHTML =
+            "<li>timeslots</li>" +
+            "   <ul>" +
+            "       <li>a list of object, each of which is one day of interviews</li>" +
+            "       <li>each timeslot object should have a \"day\" field giving the name of the day</li>" +
+            "       <li>each timeslot object should have a \"times\" field which is a list of identifiers for the individual timeslots on that day</li>" +
+            "   </ul>" +
+            "<li>companies</li>" +
+            "   <ul>" +
+            "       <li>a list of object, each of which is one company doing interviews</li>" +
+            "       <li>each company object should have a \"name\" field giving the name of the company</li>" +
+            "       <li>each company object should have a \"teams\" field which is a list of team objects</li>" +
+            "       <ul>" +
+            "           <li>each team object should have a \"name\" field giving the name of the team</li>" +
+            "           <li>each team object should have a \"positions\" field which is how many interns that company plans to accept</li>" +
+            "           <li>each team object should have a \"difficulty\" field which is a numerical score indicating how hard the team is (larger number means more difficult team)</li>" +
+            "           <li>each team object should have a \"preferences\" field which is a list of the students the team wants to interview (this list can be empty if the team has no preferences). " +
+            "               The entries should exactly match the name of a student defined below.</li>" +
+            "           <li>each team object should have a \"interviewers\" field which is a list of interviewer objects</li>" +
+            "           <ul>" +
+            "               <li>each interviewer object should have a \"name\" field giving the name of the interviewer</li>" +
+            "               <li>each interviewer object should have a \"timeslots\" field which is a list of the timeslots the interviewer will be interviewing during. " +
+            "                   Each entry should be of the form \"d_id\" where \"d\" is the \"day\" value from one of the timeslot objects " +
+            "                   and \"id\" is one of the values from that day's \"times\" field.</li>" +
+            "           </ul>" +
+            "       </ul>" +
+            "   </ul>" +
+            "<li>students</li>" +
+            "   <ul>" +
+            "       <li>a list of object, each of which is one student being interviewed</li>" +
+            "       <li>each student object should have a \"name\" field giving the name of that student</li>" +
+            "       <li>each student object should have a \"difficulty\" field which is a numerical score indicating that student's strength (larger number means stronger student)</li>" +
+            "       <li>each student object should have a \"preferences\" field which is a list of the teams the student wants to interview with (this list can be empty if the student has no preferences). " +
+            "           The entries should exactly match the name of a team defined above.</li>" +
+            "   </ul>" +
+            "<li>overrides</li>" +
+            "   <ul>" +
+            "       <li>a list of object, each of which is one override between a student and team interviewing</li>" +
+            "       <li>each override object should have a \"person\" field giving the name of the student. This must exactly match the name of a student defined above.</li>" +
+            "       <li>each override object should have a \"team\" field giving the name of the team. This must exactly match the name of a team defined above.</li>" +
+            "       <li>each override object should have a \"value\" field which is either true or false. " +
+            "           If true the student must interview with the team, and if false the student cannot interview with the team.</li>" +
+            "   </ul>" +
+            "<li>settings</li>" +
+            "   <ul>" +
+            "       <li>an object containing various settings for the constraints and scoring. This entire object, as well as each entry, is optional and will use default values if excluded.</li>" +
+            "       <li>max_interviews_per_student: each student can interview at most this many times</li>" +
+            "       <li>min_interviews_per_interviewer: each interviewer in each team must interview at least this many students</li>" +
+            "       <li>max_interviews_at_company_per_student: each student can interview at each company at most this many times</li>" +
+            "       <li>min_student_prefs_guaranteed: each student is guaranteed to interview with this many of their preferences (assuming they have that many preferences which aren't overridden)</li>" +
+            "       <li>min_team_prefs_guaranteed_per_position: each team is guaranteed to interview with this many of their preferences per internship position (assuming they have that many preferences which aren't overridden)</li>" +
+            "       <li>require_mutual_pres_to_interview: if true, each time a student and team both list each other in their preferences, that interview will be required.</li>" +
+            "       <li>time_window_size: the number of consecutive interview slots per day to consider one time window</li>" +
+            "       <li>max_interviews_per_time_window: the maximum number of interviews a student can have in any time window. " +
+            "           For example, if the \"time_window_size\" is 2 and the \"max_interviews_per_time_window\" is 1, that means no student can have back-to-back interviews (they can only have 1 interview in a group of 2 consecutive interview slots). " +
+            "           If the \"time_window_size\" is 3 and the \"max_interviews_per_time_window\" is 2, that means that in any group of three consecutive interview slots, each student can interview at most twice.</li>" +
+            "       <li>max_interviews_per_day: the maximum number of interviews each student can have per day</li>" +
+            "       <li>difficulty_diff_2_score: Any time there is an interview where the student difficulty minus the team difficulty is equal to 2, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>difficulty_diff_1_score: Any time there is an interview where the student difficulty minus the team difficulty is equal to 1, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>difficulty_diff_0_score: Any time there is an interview where the student difficulty minus the team difficulty is equal to 0, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>difficulty_diff_minus1_score: Any time there is an interview where the student difficulty minus the team difficulty is equal to -1, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>difficulty_diff_minus2_score: Any time there is an interview where the student difficulty minus the team difficulty is equal to -2, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>is_student_pref_score: Any time a student interviews at one of their preferences, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>is_team_pref_score: Any time a team interviews with one of their preferences, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>is_mutual_pref_score: Any time there is an interview which is both a student and team preference, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>random_score_max: For each interview, a random score of at most this value will be added. This allows you to rerun with the same settings and break any ties in a different way. " +
+            "           Set to 0 for no added randomness, or a very small value (0.01) for this tie-breaking behavior.</li>" +
+            "   </ul>"
+        ;
+
+        // back to landing
+        let back_div = document.createElement('div');
+        $container.append(back_div);
+
+        let back_button = document.createElement('button');
+        back_div.appendChild(back_button);
+
+        back_button.appendChild(document.createTextNode('Back...'));
+        $(back_button).click(function() {
+            landing.start();
+        });
     };
 
     const clear_container = function() {

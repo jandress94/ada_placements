@@ -64,21 +64,11 @@ placement.view = (function () {
         let column_ul = document.createElement('ul');
         instructions_div.appendChild(column_ul);
 
-        let li = document.createElement('li');
-        li.appendChild(document.createTextNode("Student Name"));
-        column_ul.appendChild(li);
-
-        li = document.createElement('li');
-        li.appendChild(document.createTextNode("Team Name"));
-        column_ul.appendChild(li);
-
-        li = document.createElement('li');
-        li.appendChild(document.createTextNode("Student Score"));
-        column_ul.appendChild(li);
-
-        li = document.createElement('li');
-        li.appendChild(document.createTextNode("Team Score"));
-        column_ul.appendChild(li);
+        column_ul.innerHTML =
+            "<li>Student Name</li>" +
+            "<li>Team Name</li>" +
+            "<li>Student Score</li>" +
+            "<li>Team Score</li>";
 
         info_p = document.createElement('p');
         instructions_div.appendChild(info_p);
