@@ -19,7 +19,7 @@ contextMenu({
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-ada_modules = [placement_main, scheduler_main];
+ada_modules = [scheduler_main, placement_main];
 
 const createWindow = () => {
   // Create the browser window.
