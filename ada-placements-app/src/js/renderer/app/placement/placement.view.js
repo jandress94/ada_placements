@@ -13,6 +13,18 @@ placement.view = (function () {
             title_h1.appendChild(document.createTextNode('Internship Placements'));
             placement_div.appendChild(title_h1);
 
+            // input instructions
+            let instructions_div = document.createElement('div');
+            placement_div.append(instructions_div);
+
+            let instructions_button = document.createElement('button');
+            instructions_div.appendChild(instructions_button);
+            instructions_button.appendChild(document.createTextNode('Input Instructions'));
+
+            $(instructions_button).click(function() {
+                show_instructions_page();
+            });
+
             // Load from file
             let load_file_button = document.createElement('button');
             placement_div.appendChild(load_file_button);
@@ -33,6 +45,225 @@ placement.view = (function () {
 
             return placement_div;
         };
+    };
+
+    const show_instructions_page = function() {
+        clear_container();
+
+        let instructions_div = document.createElement('div');
+        $container.append(instructions_div);
+
+        let title_h1 = document.createElement('h1');
+        title_h1.appendChild(document.createTextNode('Internship Placements'));
+        instructions_div.appendChild(title_h1);
+
+        let info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode("The input data should have the following columns, in this order:"));
+
+        let column_ul = document.createElement('ul');
+        instructions_div.appendChild(column_ul);
+
+        let li = document.createElement('li');
+        li.appendChild(document.createTextNode("Student Name"));
+        column_ul.appendChild(li);
+
+        li = document.createElement('li');
+        li.appendChild(document.createTextNode("Team Name"));
+        column_ul.appendChild(li);
+
+        li = document.createElement('li');
+        li.appendChild(document.createTextNode("Student Score"));
+        column_ul.appendChild(li);
+
+        li = document.createElement('li');
+        li.appendChild(document.createTextNode("Team Score"));
+        column_ul.appendChild(li);
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode("There can also be a fifth column \"Overrides\" which contains a true/false value."));
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode(
+            "One detail to point out is how to properly handle teams which have multiple positions. " +
+            "In order for there to be a placement, the input must contain the same number of unique student names and team names. " +
+            "Suppose we had four students and three companies, one of which was taking two students. " +
+            "Each student interviewed with two teams. " +
+            "In this scenario, the raw scores data would look like the following:"
+        ));
+
+        let demo_score_table = document.createElement('table');
+        instructions_div.appendChild(demo_score_table);
+
+        demo_score_table.innerHTML =
+            "<thead>" +
+            "   <tr>" +
+            "       <th>Student Name</th>" +
+            "       <th>Team Name</th>" +
+            "       <th>Student Score</th>" +
+            "       <th>Team Score</th>" +
+            "   </tr>" +
+            "</thead>" +
+            "<tbody>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Emma</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Emma</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>4</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>5</td>" +
+            "       <td>1</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Ada Lovelace</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Ada Lovelace</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "</tbody>";
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode(
+            "As is, the system will not be able to create a placement, since there are 4 students but only 3 teams. " +
+            "To address this issue, you will need to duplicate the rows associated with the team taking multiple students, " +
+            "and you will need to update the team name to differentiate between the two positions. " +
+            "The fixed input for the data above would look like this:"
+        ));
+
+        demo_score_table = document.createElement('table');
+        instructions_div.appendChild(demo_score_table);
+
+        demo_score_table.innerHTML =
+            "<thead>" +
+            "   <tr>" +
+            "       <th>Student Name</th>" +
+            "       <th>Team Name</th>" +
+            "       <th>Student Score</th>" +
+            "       <th>Team Score</th>" +
+            "   </tr>" +
+            "</thead>" +
+            "<tbody>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Ada Developers Academy, position 1</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Ada Developers Academy, position 2</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Emma</td>" +
+            "       <td>Ada Developers Academy, position 1</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Emma</td>" +
+            "       <td>Ada Developers Academy, position 2</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Emma</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>4</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Ada Developers Academy, position 1</td>" +
+            "       <td>5</td>" +
+            "       <td>1</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Ada Developers Academy, position 2</td>" +
+            "       <td>5</td>" +
+            "       <td>1</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Ada Lovelace</td>" +
+            "       <td>Ada Developers Academy, position 1</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Ada Lovelace</td>" +
+            "       <td>Ada Developers Academy, position 2</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Ada Lovelace</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "</tbody>";
+
+        // back to landing
+        let back_div = document.createElement('div');
+        $container.append(back_div);
+
+        let back_button = document.createElement('button');
+        back_div.appendChild(back_button);
+
+        back_button.appendChild(document.createTextNode('Back...'));
+        $(back_button).click(function() {
+            landing.start();
+        });
     };
 
     const clear_container = function() {
