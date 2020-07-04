@@ -1,7 +1,7 @@
 {
   "name": "ada-placements-app",
   "productName": "ada-placements-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create Internship Placements for Ada Developers Academy",
   "main": "src/js/main/index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "/Users/jim/Documents/ada_placements/ada-placements-app/src/Icon/adaIcon.icns"
+        "icon": "/Users/jim/Documents/other.nosync/ada_placements/ada-placements-app/src/Icon/adaIcon.icns"
       },
       "makers": [
         {
