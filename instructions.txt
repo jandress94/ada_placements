@@ -1,3 +1,4 @@
-to build, "npm run make"
+to build, "npm run make". Give Emma the version that is in out/make/zip/...
 
 to install packages, "npm install PACKAGE --save"
+

@@ -74,6 +74,10 @@ placement.view = (function () {
         instructions_div.appendChild(info_p);
         info_p.appendChild(document.createTextNode("There can also be a fifth column \"Overrides\" which contains a true/false value."));
 
+        let multiple_positions_title_h2 = document.createElement('h2');
+        multiple_positions_title_h2.appendChild(document.createTextNode('Teams with Multiple Positions'));
+        instructions_div.appendChild(multiple_positions_title_h2);
+
         info_p = document.createElement('p');
         instructions_div.appendChild(info_p);
         info_p.appendChild(document.createTextNode(
@@ -240,6 +244,183 @@ placement.view = (function () {
             "       <td>Acme Corporation</td>" +
             "       <td>3</td>" +
             "       <td>4</td>" +
+            "   </tr>" +
+            "</tbody>";
+
+        let different_num_team_student_h2 = document.createElement('h2');
+        different_num_team_student_h2.appendChild(document.createTextNode('Different Numbers of Teams/Students'));
+        instructions_div.appendChild(different_num_team_student_h2);
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode(
+            "Another scenario that may come up is dealing with different numbers of teams and students. " +
+            "The example below will assume there are more teams than students, but a similar solution can deal with " +
+            "the opposite scenario. " +
+            "Suppose there are two students who each interview at three companies, only two of which are shared. " +
+            "In this scenario, the raw scores data would look like the following:"
+        ));
+
+        demo_score_table = document.createElement('table');
+        instructions_div.appendChild(demo_score_table);
+
+        demo_score_table.innerHTML =
+            "<thead>" +
+            "   <tr>" +
+            "       <th>Student Name</th>" +
+            "       <th>Team Name</th>" +
+            "       <th>Student Score</th>" +
+            "       <th>Team Score</th>" +
+            "   </tr>" +
+            "</thead>" +
+            "<tbody>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>5</td>" +
+            "       <td>1</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Cyberdyne Systems</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "</tbody>";
+
+        info_p = document.createElement('p');
+        instructions_div.appendChild(info_p);
+        info_p.appendChild(document.createTextNode(
+            "As is, the system will not be able to create a placement, since there are 2 students but 4 teams. " +
+            "To address this issue, you will need to create placeholder students which represent a team not getting an " +
+            "intern assigned to them. " +
+            "The number of these placeholders must be enough to make the number of teams and students equal. " +
+            "a placeholder student should be given the same score across all teams. " +
+            "It shouldn't matter what score is given (as long it's the same across all teams and large enough " +
+            "to meet any score thresholding used when creating the placements). " +
+            "The fixed input for the data above would look like this:"
+        ));
+
+        demo_score_table = document.createElement('table');
+        instructions_div.appendChild(demo_score_table);
+
+        demo_score_table.innerHTML =
+            "<thead>" +
+            "   <tr>" +
+            "       <th>Student Name</th>" +
+            "       <th>Team Name</th>" +
+            "       <th>Student Score</th>" +
+            "       <th>Team Score</th>" +
+            "   </tr>" +
+            "</thead>" +
+            "<tbody>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>2</td>" +
+            "       <td>3</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Jim</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>5</td>" +
+            "       <td>1</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>3</td>" +
+            "       <td>4</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>Moby</td>" +
+            "       <td>Cyberdyne Systems</td>" +
+            "       <td>1</td>" +
+            "       <td>2</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 1</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 1</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 1</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 1</td>" +
+            "       <td>Cyberdyne Systems</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 2</td>" +
+            "       <td>Ada Developers Academy</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 2</td>" +
+            "       <td>Lirio, LLC</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 2</td>" +
+            "       <td>Acme Corporation</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
+            "   </tr>" +
+            "   <tr>" +
+            "       <td>No Intern 2</td>" +
+            "       <td>Cyberdyne Systems</td>" +
+            "       <td>5</td>" +
+            "       <td>5</td>" +
             "   </tr>" +
             "</tbody>";
 
