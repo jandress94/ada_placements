@@ -1,7 +1,7 @@
 {
   "name": "ada-placements-app",
   "productName": "ada-placements-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Create Internship Placements for Ada Developers Academy",
   "main": "src/js/main/index.js",
   "scripts": {
@@ -52,19 +52,19 @@
   },
   "dependencies": {
     "convert-array-to-csv": "^1.0.12",
-    "csv-parse": "^4.8.5",
-    "electron-context-menu": "^2.0.1",
+    "csv-parse": "^4.14.1",
+    "electron-context-menu": "^2.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "googleapis": "^51.0.0",
     "javascript-lp-solver": "^0.4.24",
     "minimist": "^1.2.5"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.47",
-    "@electron-forge/maker-deb": "^6.0.0-beta.47",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.47",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.47",
-    "@electron-forge/maker-zip": "^6.0.0-beta.47",
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "electron": "7.2.4"
   }
 }
