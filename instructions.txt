@@ -1,3 +1,5 @@
+to refresh the package lock, run "npm i --package-lock-only"
+
 to build, "npm run make". Give Emma the version that is in out/make/zip/...
 
 to install packages, "npm install PACKAGE --save"
