@@ -91,22 +91,24 @@ placement.model = (function () {
             let personConstraint = "person_" + r.person;
             let companyConstraint = "company_" + r.company;
             let overwriteConstraint = "overwrite_" + r.person + "_" + r.company;
-
-            if (r.person_score < settings[placement.constants.MIN_STUDENT_SCORE] ||
-                r.company_score < settings[placement.constants.MIN_TEAM_SCORE]) {
-                continue;
-            }
+            let scoreMinsConstraint = "scoreMins_" + r.person + "_" + r.company;
 
             variables[personCompanyVar] = {
                 id: r.id,
                 [personConstraint]: 1,
                 [companyConstraint]: 1,
                 [overwriteConstraint]: 1,
+                [scoreMinsConstraint]: 1,
                 score: r.score
             };
 
             if (r.overwrite != null) {
                 constraints[overwriteConstraint] = { equal: r.overwrite ? 1 : 0 };
+            }
+
+            if (r.person_score < settings[placement.constants.MIN_STUDENT_SCORE] ||
+                r.company_score < settings[placement.constants.MIN_TEAM_SCORE]) {
+                constraints[scoreMinsConstraint] = { equal: 0 };
             }
 
             intVars[personCompanyVar] = 1;
