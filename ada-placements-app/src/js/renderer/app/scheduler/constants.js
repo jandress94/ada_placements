@@ -1,4 +1,7 @@
 module.exports = {
+    NEOS_SERVER_ADDRESS: "https://neos-server.org:3333",
+    NEOS_EMAIL_ADDRESS: "emma@adadevelopersacademy.org",
+
     // constraints
     MAX_INTERVIEW_PER_STUDENT: "max_interviews_per_student",
     DEFAULT_MAX_INTERVIEW_PER_STUDENT: 6,

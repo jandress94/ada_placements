@@ -392,6 +392,10 @@ scheduler.model = (function () {
             let job_num = $d.find('int').first().text();
             let job_pwd = $d.find('string').first().text();
 
+            if (job_pwd.startsWith("Error: ")) {
+                throw 'Error submitting job: ' + job_pwd;
+            }
+
             console.log('Job Num: ' + job_num);
             console.log('Job Pwd: ' + job_pwd);
 
@@ -401,7 +405,7 @@ scheduler.model = (function () {
                 job_pwd +
                 '</string></value></param></params></methodCall>';
 
-            $.post('https://neos-server.org:3333', xml_rpc_results_request)
+            $.post(scheduler.constants.NEOS_SERVER_ADDRESS, xml_rpc_results_request)
                 .done(function(data) {
                     let error = _parse_solved_model(data);
 
@@ -425,7 +429,7 @@ scheduler.model = (function () {
                 "<solver>MOSEK</solver>" +
                 "<inputType>AMPL</inputType>" +
                 "<priority>long</priority>" +
-                "<email></email>" +
+                "<email>" + scheduler.constants.NEOS_EMAIL_ADDRESS + "</email>" +
                 "<model><![CDATA[" +
                 ampl_model +
                 "]]></model>" +
@@ -442,7 +446,7 @@ scheduler.model = (function () {
                 job_xml +
                 '</string></value></param></params></methodCall>';
 
-            $.post('https://neos-server.org:3333', xml_rpc_submit_request)
+            $.post(scheduler.constants.NEOS_SERVER_ADDRESS, xml_rpc_submit_request)
                 .done(function(data) {
                     _get_solved_model(data)
                         .then(function() {
