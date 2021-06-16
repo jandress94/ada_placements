@@ -555,7 +555,7 @@ scheduler.model = (function () {
         return config;
     };
 
-    const _save_schedule_to_array = function(schedule) {
+    const save_schedule_to_array = function(schedule) {
         let has_timezone_info = false;
         for (let i = 0; i < schedule.length; i++) {
             if (schedule[i].hasOwnProperty('timezone_diff')) {
@@ -584,7 +584,7 @@ scheduler.model = (function () {
                 s.difficulty_diff
             ];
             if (has_timezone_info) {
-                r.push(s.timezone_diff);
+                r.push(s.hasOwnProperty('timezone_diff') ? s.timezone_diff : '');
             }
             r.push(s.score, s.is_override === null ? s.is_override : s.is_override.toString());
 
@@ -600,7 +600,7 @@ scheduler.model = (function () {
             }
             return resolve(solved_model.schedule);
         }).then(
-            schedule_data => util.io.save_to_sheet('Interview Schedule', () => _save_schedule_to_array(schedule_data))
+            schedule_data => util.io.save_to_sheet('Interview Schedule', () => save_schedule_to_array(schedule_data))
         );
     };
 
@@ -611,7 +611,7 @@ scheduler.model = (function () {
             }
             return resolve(solved_model.schedule);
         }).then(
-            schedule_data => util.io.save_to_csv(() => _save_schedule_to_array(schedule_data))
+            schedule_data => util.io.save_to_csv(() => save_schedule_to_array(schedule_data))
         );
     };
 
@@ -626,6 +626,7 @@ scheduler.model = (function () {
         update_setting: update_setting,
         get_solved_model: get_solved_model,
         update_overwrite: update_overwrite,
+        save_schedule_to_array: save_schedule_to_array,
         save_schedule_to_sheets: save_schedule_to_sheets,
         save_schedule_to_csv: save_schedule_to_csv,
         save_config_to_file: save_config_to_file

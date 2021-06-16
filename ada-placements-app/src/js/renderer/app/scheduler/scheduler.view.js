@@ -571,11 +571,11 @@ scheduler.view = (function () {
         return table_entry;
     };
 
-    const _create_overwrite_select = function(schedule_obj) {
+    const _create_overwrite_select = function(s_name, t_name, is_override) {
         let overwrite_select = document.createElement('select');
         $(overwrite_select).change(function() {
             let new_val = JSON.parse($(overwrite_select).find('option:selected').val());
-            scheduler.controller.handle_overwrite_changed(schedule_obj.student_name, schedule_obj.team_name, new_val);
+            scheduler.controller.handle_overwrite_changed(s_name, t_name, new_val);
         });
 
         let blank_option = document.createElement('option');
@@ -592,14 +592,14 @@ scheduler.view = (function () {
         no_option.appendChild(document.createTextNode('No'));
         overwrite_select.appendChild(no_option);
 
-        if (schedule_obj.is_override === null) {
+        if (is_override === null) {
             blank_option.setAttribute('selected', 'selected');
-        } else if (schedule_obj.is_override) {
+        } else if (is_override === true || is_override === 'true') {
             yes_option.setAttribute('selected', 'selected');
-        } else if (!schedule_obj.is_override) {
+        } else if (is_override === false || is_override === 'false') {
             no_option.setAttribute('selected', 'selected');
         } else {
-            throw "Unknown overwrite value: " + schedule_obj.overwrite;
+            throw "Unknown overwrite value: " + is_override;
         }
 
         return overwrite_select;
@@ -674,8 +674,9 @@ scheduler.view = (function () {
         let header_row = document.createElement('tr');
         schedule_table_head.appendChild(header_row);
 
-        let col_names = ['student name', 'company name', 'team name', 'interviewer name', 'timeslot',
-            'is student preference?', 'is team preference?', 'student - team difficulty', 'score', 'override'];
+        let schedule_array = scheduler.model.save_schedule_to_array(solved_model.schedule);
+
+        let col_names = schedule_array[0];
         for (let i = 0; i < col_names.length; i++) {
             let column_name = col_names[i];
             let header = document.createElement('th');
@@ -685,18 +686,19 @@ scheduler.view = (function () {
 
         let schedule_table_body = document.createElement('tbody');
         schedule_table.appendChild(schedule_table_body);
-        for (let i = 0; i < solved_model.schedule.length; i++) {
+        for (let i = 1; i < schedule_array.length; i++) {
             let row = document.createElement('tr');
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].student_name)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].company_name)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].team_name)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].interviewer_name)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].timeslot)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_student_pref)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].is_team_pref)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].difficulty_diff)));
-            row.appendChild(_create_table_entry(document.createTextNode(solved_model.schedule[i].score)));
-            row.appendChild(_create_table_entry(_create_overwrite_select(solved_model.schedule[i])));
+
+            for (let j = 0; j < schedule_array[i].length; j++) {
+                if (j !== schedule_array[i].length - 1) {
+                    row.appendChild(_create_table_entry(document.createTextNode(schedule_array[i][j])));
+                } else {
+                    row.appendChild(_create_table_entry(_create_overwrite_select(
+                        schedule_array[i][0],       // student name
+                        schedule_array[i][2],       // team name
+                        schedule_array[i][j])))     // override
+                }
+            }
             schedule_table_body.appendChild(row);
         }
 
