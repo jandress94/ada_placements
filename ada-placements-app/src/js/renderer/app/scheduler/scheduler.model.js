@@ -204,6 +204,10 @@ scheduler.model = (function () {
                                 score: score
                             };
 
+                            if (student.hasOwnProperty("timezone") && team.hasOwnProperty("timezone")) {
+                                _var_name_to_data_map[var_name].timezone_diff = Math.abs(student.timezone - team.timezone)
+                            }
+
                             score_terms.push(score + " * " + var_name);
 
                             // make sure each student interviews with at least n teams and at most m teams
@@ -552,11 +556,24 @@ scheduler.model = (function () {
     };
 
     const _save_schedule_to_array = function(schedule) {
-        let values = [['Student', 'Company', 'Team', 'Interviewer', 'Timeslot', 'Student Preference?', 'Team Preference?', 'Student - Team Difficulty', 'Score', 'Override']];
+        let has_timezone_info = false;
+        for (let i = 0; i < schedule.length; i++) {
+            if (schedule[i].hasOwnProperty('timezone_diff')) {
+                has_timezone_info = true;
+                break;
+            }
+        }
+
+        let values = [['Student', 'Company', 'Team', 'Interviewer', 'Timeslot', 'Student Preference?', 'Team Preference?', 'Student - Team Difficulty']];
+        if (has_timezone_info) {
+            values[0].push('Timezone Difference');
+        }
+        values[0].push('Score', 'Override');
+
         for (let i = 0; i < schedule.length; i++) {
             let s = schedule[i];
 
-            values.push([
+            let r = [
                 s.student_name,
                 s.company_name,
                 s.team_name,
@@ -564,10 +581,14 @@ scheduler.model = (function () {
                 s.timeslot,
                 s.is_student_pref.toString(),
                 s.is_team_pref.toString(),
-                s.difficulty_diff,
-                s.score,
-                s.is_override === null ? s.is_override : s.is_override.toString()
-            ]);
+                s.difficulty_diff
+            ];
+            if (has_timezone_info) {
+                r.push(s.timezone_diff);
+            }
+            r.push(s.score, s.is_override === null ? s.is_override : s.is_override.toString());
+
+            values.push(r);
         }
         return values;
     };
