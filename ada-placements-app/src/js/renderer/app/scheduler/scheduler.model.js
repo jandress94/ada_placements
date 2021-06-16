@@ -530,6 +530,9 @@ scheduler.model = (function () {
         _add_val_if_not_exists(settings, scheduler.constants.IS_MUTUAL_PREF_SCORE,
             scheduler.constants.DEFAULT_IS_MUTUAL_PREF_SCORE);
 
+        _add_val_if_not_exists(settings, scheduler.constants.TIMEZONE_DIFFERENCE_PENALTY,
+            scheduler.constants.DEFAULT_TIMEZONE_DIFFERENCE_PENALTY);
+
         _add_val_if_not_exists(settings, scheduler.constants.RANDOM_SCORE_MAX,
             scheduler.constants.DEFAULT_RANDOM_SCORE_MAX);
     };

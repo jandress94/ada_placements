@@ -43,6 +43,9 @@ module.exports = {
     IS_MUTUAL_PREF_SCORE: "is_mutual_pref_score",
     DEFAULT_IS_MUTUAL_PREF_SCORE: 6,
 
+    TIMEZONE_DIFFERENCE_PENALTY: "timezone_difference_penalty",
+    DEFAULT_TIMEZONE_DIFFERENCE_PENALTY: -2,
+
     RANDOM_SCORE_MAX: "random_score_max",
     DEFAULT_RANDOM_SCORE_MAX: 0.0
 };
