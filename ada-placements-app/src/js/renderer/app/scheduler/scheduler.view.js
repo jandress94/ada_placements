@@ -108,6 +108,7 @@ scheduler.view = (function () {
             "\t\t\t\t{\n" +
             "\t\t\t\t\t\"name\": \"Ada Developers Academy Team 1\",\n" +
             "\t\t\t\t\t\"positions\": 1,\n" +
+            "\t\t\t\t\t\"timezone\": 1,\n" +
             "\t\t\t\t\t\"difficulty\": 3,\n" +
             "\t\t\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\t\t\"Ada Lovelace\"\n" +
@@ -125,6 +126,7 @@ scheduler.view = (function () {
             "\t\t\t\t{\n" +
             "\t\t\t\t\t\"name\": \"Ada Developers Academy Team 2\",\n" +
             "\t\t\t\t\t\"positions\": 1,\n" +
+            "\t\t\t\t\t\"timezone\": 2,\n" +
             "\t\t\t\t\t\"difficulty\": 1,\n" +
             "\t\t\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\t\t\"Moby\",\n" +
@@ -148,6 +150,7 @@ scheduler.view = (function () {
             "\t\t\t\t{\n" +
             "\t\t\t\t\t\"name\": \"Lirio Team 1\",\n" +
             "\t\t\t\t\t\"positions\": 2,\n" +
+            "\t\t\t\t\t\"timezone\": 3,\n" +
             "\t\t\t\t\t\"difficulty\": 2,\n" +
             "\t\t\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\t\t\"Jim\",\n" +
@@ -200,6 +203,7 @@ scheduler.view = (function () {
             "\t\t{\n" +
             "\t\t\t\"name\": \"Jim\",\n" +
             "\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\"timezone\": 1,\n" +
             "\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\"Ada Developers Academy Team 2\",\n" +
             "\t\t\t\t\"Lirio Team 1\"\n" +
@@ -208,6 +212,7 @@ scheduler.view = (function () {
             "\t\t{\n" +
             "\t\t\t\"name\": \"Emma\",\n" +
             "\t\t\t\"difficulty\": 2,\n" +
+            "\t\t\t\"timezone\": 2,\n" +
             "\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\"Ada Developers Academy Team 1\",\n" +
             "\t\t\t\t\"Lirio Team 1\"\n" +
@@ -216,6 +221,7 @@ scheduler.view = (function () {
             "\t\t{\n" +
             "\t\t\t\"name\": \"Moby\",\n" +
             "\t\t\t\"difficulty\": 1,\n" +
+            "\t\t\t\"timezone\": 3,\n" +
             "\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\"Lirio Team 1\",\n" +
             "\t\t\t\t\"Acme Team 1\"\n" +
@@ -224,6 +230,7 @@ scheduler.view = (function () {
             "\t\t{\n" +
             "\t\t\t\"name\": \"Ada Lovelace\",\n" +
             "\t\t\t\"difficulty\": 3,\n" +
+            "\t\t\t\"timezone\": 4,\n" +
             "\t\t\t\"preferences\": [\n" +
             "\t\t\t\t\"Ada Developers Academy Team 1\",\n" +
             "\t\t\t\t\"Ada Developers Academy Team 2\"\n" +
@@ -264,6 +271,7 @@ scheduler.view = (function () {
             "\t\t\"is_student_pref_score\": 1,\n" +
             "\t\t\"is_team_pref_score\": 4,\n" +
             "\t\t\"is_mutual_pref_score\": 6,\n" +
+            "\t\t\"timezone_difference_penalty\": -2,\n" +
             "\t\t\"random_score_max\": 0\n" +
             "\t}\n" +
             "}";
@@ -290,6 +298,7 @@ scheduler.view = (function () {
             "       <ul>" +
             "           <li>each team object should have a \"name\" field giving the name of the team</li>" +
             "           <li>each team object should have a \"positions\" field which is how many interns that company plans to accept</li>" +
+            "           <li>each team object may optionally have a \"timezone\" field which is an integer representation of which timezone they expect their intern to work in (e.g. 1 for Pacific time, 2 for Mountain time, etc)</li>" +
             "           <li>each team object should have a \"difficulty\" field which is a numerical score indicating how hard the team is (larger number means more difficult team)</li>" +
             "           <li>each team object should have a \"preferences\" field which is a list of the students the team wants to interview (this list can be empty if the team has no preferences). " +
             "               The entries should exactly match the name of a student defined below.</li>" +
@@ -306,6 +315,7 @@ scheduler.view = (function () {
             "   <ul>" +
             "       <li>a list of object, each of which is one student being interviewed</li>" +
             "       <li>each student object should have a \"name\" field giving the name of that student</li>" +
+            "       <li>each student object may optionally have a \"timezone\" field which is an integer representation of which timezone that student will work in (e.g. 1 for Pacific time, 2 for Mountain time, etc)</li>" +
             "       <li>each student object should have a \"difficulty\" field which is a numerical score indicating that student's strength (larger number means stronger student)</li>" +
             "       <li>each student object should have a \"preferences\" field which is a list of the teams the student wants to interview with (this list can be empty if the student has no preferences). " +
             "           The entries should exactly match the name of a team defined above.</li>" +
@@ -340,6 +350,11 @@ scheduler.view = (function () {
             "       <li>is_student_pref_score: Any time a student interviews at one of their preferences, this value will be added to the total score for the interview schedule</li>" +
             "       <li>is_team_pref_score: Any time a team interviews with one of their preferences, this value will be added to the total score for the interview schedule</li>" +
             "       <li>is_mutual_pref_score: Any time there is an interview which is both a student and team preference, this value will be added to the total score for the interview schedule</li>" +
+            "       <li>timezone_difference_penalty: If both a student and a team have a \"timezone\" specified, the difference between the two will be multiplied by this factor and added to the score</li>" +
+            "         <ul>" +
+            "           <li>The penalty should be a negative number to punish differences in timezones</li>" +
+            "           <li>If a student or team's \"timezone\" is missing, no timezone information will factor into the scores for that student or team</li>" +
+            "         </ul>" +
             "       <li>random_score_max: For each interview, a random score of at most this value will be added. This allows you to rerun with the same settings and break any ties in a different way. " +
             "           Set to 0 for no added randomness, or a very small value (0.01) for this tie-breaking behavior.</li>" +
             "   </ul>"
