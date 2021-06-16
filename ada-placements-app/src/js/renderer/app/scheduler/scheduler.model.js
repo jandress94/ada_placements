@@ -185,6 +185,10 @@ scheduler.model = (function () {
                                 score += config.settings[scheduler.constants.DIFFICULTY_DIFF_MINUS2_SCORE];
                             }
 
+                            if (student.hasOwnProperty("timezone") && team.hasOwnProperty("timezone")) {
+                                score += Math.abs(student.timezone - team.timezone) * config.settings[scheduler.constants.TIMEZONE_DIFFERENCE_PENALTY]
+                            }
+
                             score += (2 * Math.random() - 1) * config.settings[scheduler.constants.RANDOM_SCORE_MAX];
 
                             _var_name_to_data_map[var_name] = {
