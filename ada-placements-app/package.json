@@ -57,7 +57,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "googleapis": "^51.0.0",
     "javascript-lp-solver": "^0.4.24",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.6"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.54",
